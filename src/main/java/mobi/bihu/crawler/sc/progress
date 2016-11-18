@@ -1,0 +1,23 @@
+todo here is list
+    1.thirft module, link appapi client and ServiceManager,to return a suitalbe Server   (one thrift server)
+    2.thrift module, link ComputerManager and RemoteComputer,to read RemoteComputer's information  (one thrift client)
+    3.algorithm
+
+todo do not forget test.
+
+todo do not make suitable Log
+
+todo thrift(0/4)
+
+2016/11/17
+
+todo Try Reused TSOCKET,make a TSOCKET Pool
+
+todo Center thrift client      finished.
+todo App-api thrift Server
+
+todo Center thrift Server
+todo PHP thrift Client
+
+
+todo CenterService only simple return a suitable ip:port. that is all.
