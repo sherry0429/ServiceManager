@@ -1,2 +1,0 @@
-2016-11-17 15:11:24,344 ERROR [] SCMain.java:40 ## Fail to parse conf file conf/app_api.conf, Cannot read file conf/app_api.conf
-2016-11-17 15:11:46,460 ERROR [] SCMain.java:40 ## Fail to parse conf file conf/app_api.conf, Cannot read file conf/app_api.conf
