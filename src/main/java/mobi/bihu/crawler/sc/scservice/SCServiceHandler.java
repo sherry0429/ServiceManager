@@ -31,7 +31,7 @@ public class SCServiceHandler implements CenterManageService.Iface{
         //request is appApiName,here are many kinds of appApisName
         switch (serviceName){
             case "appapi":{
-                return manager.getMinNodes();
+                return manager.getSuitableNode();
             }
         }
         return null;

@@ -33,7 +33,7 @@ import java.util.TimeZone;
 public class ServiceManager {
     private static NodeManager Nodes;
     private static ZKClient zkclient;
-    private static int internal = 1000;
+    private static int internal = 5000;
     private String zkServer;
     private int zkTimeout;
     private SCConfig config;
@@ -54,8 +54,11 @@ public class ServiceManager {
         public void run() {
             while(true){
                 try {
-                    Nodes.updateNodeInfoTiming();
+                    //warning: this internal > Nodes.internal
+                    if(Nodes != null)
+                        Nodes.updateNodeInfoTiming();
                     Thread.sleep(internal);
+                    zkclient.deleteNode("");
                 }catch (InterruptedException e){
                     e.printStackTrace();
                 }
@@ -115,6 +118,7 @@ public class ServiceManager {
                 }
             }
         });
+        // TODO: 16-11-18 make /crawler/appAPIs_ty as a variable
         zkclient.watchNodeChildrenChanged("/crawler/appAPIs_ty", new ZKCallback.ChildrenChangedListener() {
             @Override
             public void onChildrenChanged(List<String> list) {
@@ -155,11 +159,8 @@ public class ServiceManager {
         return true;
     }
     
-    public String getMaxNodes(){
-        return Nodes.getMaxLoadNode();
+    public String getSuitableNode(){
+        return Nodes.getSuitable();
     }
-    
-    public String getMinNodes(){
-        return Nodes.getMinLoadNode();
-    }
+
 }

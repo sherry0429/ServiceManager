@@ -15,17 +15,19 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 
 public class NodeManager {
-    private static ConcurrentHashMap<String,NodeInfo>NodeInfoMap;//String type : IP:PORT
+    private static ConcurrentHashMap<String,Node>nodeInfoMap;//String type : IP:PORT
+    private static ConcurrentHashMap<String,Integer>nodeKeyTimeMap;//String type : IP:PORT
+
     private static Ruler ruler;
-    private int NodeConnectTimeout = 3000;
+    private int NodeConnectTimeout = 1000;
     private static Logger LOG = LoggerFactory.getLogger(NodeManager.class);
-    private static NodeStatusUpdateThread timerUpdate;
     private int maxThread = 20;
+    private int ChangeTimes = 0;
 
     public NodeManager(){
         ruler = new Ruler();
-        NodeInfoMap = new ConcurrentHashMap<>();
-        timerUpdate = new NodeStatusUpdateThread(maxThread,NodeConnectTimeout);
+        nodeInfoMap = new ConcurrentHashMap<>();
+        nodeKeyTimeMap = new ConcurrentHashMap<>();
     }
 
     public void init(String nodeList){
@@ -33,7 +35,7 @@ public class NodeManager {
         String nodes[] = nodeList.split(",");
         for (String node : nodes) {
             LOG.info("NodeManager add node : {}",node);
-            addNode(node);
+            addNode(node,ChangeTimes);
         }
     }
 
@@ -41,43 +43,37 @@ public class NodeManager {
         ruler = arg;
     }
 
-    public String getMaxLoadNode(){
+    public String getSuitable(){
         // TODO: 16-11-16 example for use ruler
-        return ruler.findMax(NodeInfoMap);
+        return ruler.findSuitable(nodeInfoMap);
     }
 
-    public String getMinLoadNode(){
-        // TODO: 16-11-16 example for use ruler
-        return ruler.findMin(NodeInfoMap);
-    }
-
-    public NodeInfo getNode(String path){
-        return NodeInfoMap.get(path);
+    public Node getNode(String path){
+        return nodeInfoMap.get(path);
     }
 
     /**
-     * Description: add a <path,NodeInfo> in ConcurrentHashMap,when many threads run,should test it.
+     * Description: add a <path,Node> in ConcurrentHashMap,when many threads run,should test it.
      * Input: ip:port
      * Output: add success & failed
      * Authers: tianyoupan
      */
     // TODO: 16-11-17 when many threads request this function,check the hashMap's situation.
-    public boolean addNode(String ipWithPort){
-        while(true){
-            NodeInfo oldvalue = NodeInfoMap.get(ipWithPort);
-            if(oldvalue == null){
-                NodeInfo info = new NodeInfo();
-                if(NodeInfoMap.putIfAbsent(ipWithPort,info) == null){
-                    LOG.info("addNode first {}",ipWithPort);
-                    break;
+    public synchronized boolean addNode(String ipWithPort,int ChangeTimes) {
+        Node oldvalue = nodeInfoMap.get(ipWithPort);
+        String args[] = ipWithPort.split(":");
+        if (oldvalue == null) {
+            Node info = new Node(args[0],Integer.parseInt(args[1]));
+            if (nodeInfoMap.putIfAbsent(ipWithPort, info) == null) {
+                if(nodeKeyTimeMap.get(ipWithPort) == null){
+                    nodeKeyTimeMap.putIfAbsent(ipWithPort,0);
                 }
-            }else{
-                /* Node has been added */
-                LOG.warn("add a existed Node {}",ipWithPort);
-                    break;
+                LOG.info("addNode first {}", ipWithPort);
             }
+        } else {
+                /* Node has been added */
+            LOG.warn("add a existed Node {}", ipWithPort);
         }
-
         return true;
     }
 
@@ -88,8 +84,9 @@ public class NodeManager {
      * Authers: tianyoupan
      */
     public boolean deleteNode(String ipWithPort){
-        if(NodeInfoMap.remove(ipWithPort)!=null)
+        if(nodeInfoMap.remove(ipWithPort)!=null){
             return true;
+        }
         LOG.warn("DeleteNode failed {}",ipWithPort);
         return false;
     }
@@ -100,27 +97,49 @@ public class NodeManager {
      * Output:
      * Authers: tianyoupan
      */
-    // TODO: 16-11-17 also,every time "map.clear",cost too many resource,think a better way.
-    // TODO: 16-11-17 when ThreadA call RequestNodeInfo, it read map,ThreadB call UpdateNodeMap it clear map,Test it to make sure ConcurrentHashMap lock or unlock
     public void updateNodeMap(List<String> list){
-        if(list == null)
+        if(list.isEmpty() || list == null)
             return;
-        NodeInfoMap.clear();
+        LOG.info("ChangedNode Example : {} ",list.get(0));
+        ChangeTimes++;
         for (String s : list) {
-            String args[] = s.split(",");
-            addNode(args[0]);
+            nodeKeyTimeMap.putIfAbsent(s,ChangeTimes);
+        }
+        //here use algorithm replace "deleteAll" opertaion.
+        //1.define a map to save every node's changeTimes,like Generation,one by one.
+        //2.ChangeTimes means Generations,use this variable also can record NodeChangeFunction called times.
+        //3.ChangeTimes will be n or n+1,if n+1,that is "ChangedNode",if "n",is Origin Nodes.
+        String oldEntry = null;
+        for (Map.Entry<String, Integer> entry : nodeKeyTimeMap.entrySet()) {
+            if(oldEntry != null){
+                nodeKeyTimeMap.remove(oldEntry);
+                oldEntry = null;
+            }
+            String node = entry.getKey();
+            Integer generation = entry.getValue();
+            if(generation == ChangeTimes){
+                if(nodeInfoMap.get(node) == null){
+                    addNode(node,ChangeTimes);
+                }
+            }
+            if(generation == (ChangeTimes - 1)){
+                nodeInfoMap.remove(entry.getKey());
+                oldEntry = node;
+            }
         }
     }
 
     /**
-     * Description: this update funcation used by NodeStatusUpdateThread class(Excutor),every thrift use one thread.
+     * Description: this update funcation used by NodeStatusUpdate class(Excutor),every thrift use one thread.
      * Input:
      * Output: success & failed.
      * Authers: tianyoupan
      */
     public boolean updateNodeInfoTiming(){
-        for(Map.Entry<String,NodeInfo> e: NodeInfoMap.entrySet() ){
-            timerUpdate.updateTimer(e.getKey(),e.getValue());
+        for(Map.Entry<String,Node> e: nodeInfoMap.entrySet() ){
+            if(e!=null){
+                e.getValue().request(NodeConnectTimeout);
+            }
         }
         return true;
     }

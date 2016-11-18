@@ -15,11 +15,14 @@ public class Ruler {
 
     }
 
-    public String findMax(ConcurrentHashMap<String,NodeInfo> info){
+    // TODO: 16-11-18 need Node's info,to select suitable algorithm
+    private String findMax(ConcurrentHashMap<String,Node> info){
         return null;
     }
 
-    public String findMin(ConcurrentHashMap<String,NodeInfo> info){
+    private String findMin(ConcurrentHashMap<String,Node> info){
         return null;
     }
+
+    public String findSuitable(ConcurrentHashMap<String,Node> info){return null;}
 }
