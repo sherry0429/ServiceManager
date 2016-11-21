@@ -4,7 +4,8 @@ package mobi.bihu.crawler.sc;
  * Created by tianyoupan on 16-11-16.
  */
 
-import mobi.bihu.crawler.sc.scnode.NodeManager;
+import mobi.bihu.crawler.sc.manager.NodeManager;
+import mobi.bihu.crawler.sc.manager.ServiceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +17,7 @@ import java.util.TimeZone;
 
 public class SCMain {
     private static final Logger LOG = LoggerFactory.getLogger(SCMain.class);
-    private static final String DEFAULT_CONF_FILE = "conf/app_api.conf";
+    private static final String DEFAULT_CONF_FILE = "conf/sc.conf";
 
     static {
         TimeZone.setDefault(TimeZone.getTimeZone("PRC"));
@@ -37,8 +38,9 @@ public class SCMain {
         }
         /** init Center */
         NodeManager nodeManager = new NodeManager();
-        nodeManager.init(config.getZkServer());
+        nodeManager.init(config.getZkList());
         ServiceManager serviceManager = new ServiceManager(config, nodeManager);
+        serviceManager.initManager();
 
         boolean status = serviceManager.startManager();
         if (!status) {

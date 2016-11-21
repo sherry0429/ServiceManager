@@ -1,4 +1,4 @@
-package mobi.bihu.crawler.sc;
+package mobi.bihu.crawler.sc.manager;
 
 /**
  * Created by tianyoupan on 16-11-15.
@@ -10,9 +10,9 @@ package mobi.bihu.crawler.sc;
 
 /** unprepared, do not use this package. thanks */
 
-import mobi.bihu.crawler.sc.scnode.NodeManager;
-import mobi.bihu.crawler.sc.scservice.SCServiceHandler;
-import mobi.bihu.crawler.thrift.CenterManageService;
+import mobi.bihu.crawler.sc.SCConfig;
+import mobi.bihu.crawler.sc.handler.SCServiceHandler;
+import mobi.bihu.crawler.sc.thrift.sc_server;
 import mobi.bihu.crawler.zookeeper.ZKCallback;
 import mobi.bihu.crawler.zookeeper.ZKClient;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -32,13 +32,11 @@ import java.util.TimeZone;
 public class ServiceManager {
     private static NodeManager Nodes;
     private static ZKClient zkclient;
-    private static int internal = 5000;
+    private static int internal = 1000;
     private String zkServer;
     private int zkTimeout;
     private SCConfig config;
     private static Logger LOG = LoggerFactory.getLogger(ServiceManager.class);
-    final String node;
-    final String data;
     private NodeMainService cpRunable;
     private Thread cpThread;
 
@@ -57,7 +55,6 @@ public class ServiceManager {
                     if(Nodes != null)
                         Nodes.updateNodeInfoTiming();
                     Thread.sleep(internal);
-                    zkclient.deleteNode("");
                 }catch (InterruptedException e){
                     e.printStackTrace();
                 }
@@ -70,25 +67,25 @@ public class ServiceManager {
     }
 
     public ServiceManager(SCConfig conf, NodeManager manager) {
-        config = conf;
-        zkServer = config.getZkServer();
-        zkTimeout = config.getZkTimeout();
-        data = config.getIP() + ":" + config.getPort() + "," +config.getName();
-        node = config.getZkNode();
-        this.initManager(zkServer,zkTimeout,manager);
+        if (conf == null || manager == null) {
+            LOG.error("NULL Config or NULL NodeManager.");
+            System.exit(1);
+        }else{
+            config = conf;
+            Nodes = manager;
+        }
+
     }
 
-    public boolean initManager(String zkServer,int timeout,NodeManager arg){
-        if(zkclient != null)
-            return true;
-        if (arg != null) {
-            Nodes = arg;
-        }else{
-            Nodes = new NodeManager();
-            LOG.warn("NodeManager is Null, create a default NodeManager zkServer:{}",zkServer);
-        }
+    public boolean initManager(){
+        zkServer = config.getZkServer();
+        zkTimeout = config.getZkTimeout();
+        String data = config.getIP() + ":" + config.getPort() + "," +config.getName();
+        String node = config.getZkNode();
+        String zkNodeList = config.getZkNodeList();
+
         try {
-            zkclient = new ZKClient(zkServer,timeout);
+            zkclient = new ZKClient(zkServer,zkTimeout);
         } catch (IOException e) {
             System.exit(-1);
         }
@@ -117,13 +114,18 @@ public class ServiceManager {
                 }
             }
         });
-        // TODO: 16-11-18 make /crawler/appAPIs_ty as a variable
-        zkclient.watchNodeChildrenChanged("/crawler/appAPIs_ty", new ZKCallback.ChildrenChangedListener() {
-            @Override
-            public void onChildrenChanged(List<String> list) {
-                Nodes.updateNodeMap(list);
-            }
-        });
+        //every service have a watcher.
+        String[] nodelist = zkNodeList.split("\\|");
+        for (String s : nodelist) {
+            String[] args = s.split("@");
+            zkclient.watchNodeChildrenChanged(args[1], new ZKCallback.ChildrenChangedListener() {
+                @Override
+                public void onChildrenChanged(List<String> list) {
+                    Nodes.updateNodeMap(args[0],list);
+                }
+            });
+
+        }
         return true;
     }
 
@@ -139,7 +141,7 @@ public class ServiceManager {
 
         //start thrift Server
         SCServiceHandler handler = new SCServiceHandler(config,this);
-        CenterManageService.Processor<SCServiceHandler> processor = new CenterManageService.Processor<SCServiceHandler>(handler);
+        sc_server.Processor<SCServiceHandler> processor = new sc_server.Processor<SCServiceHandler>(handler);
         TServerSocket transport = null;
         try {
             transport = new TServerSocket(config.getPort());
@@ -158,8 +160,8 @@ public class ServiceManager {
         return true;
     }
     
-    public String getSuitableNode(){
-        return Nodes.getSuitable();
+    public String getSuitableNode(String serviceName){
+        return Nodes.getSuitable(serviceName);
     }
 
 }
