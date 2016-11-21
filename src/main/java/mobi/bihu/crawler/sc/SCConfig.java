@@ -1,4 +1,4 @@
-package mobi.bihu.crawler; /**
+package mobi.bihu.crawler.sc; /**
  * Created by tianyoupan on 16-11-16.
  */
 

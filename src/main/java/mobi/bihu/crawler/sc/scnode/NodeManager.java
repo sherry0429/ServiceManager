@@ -22,7 +22,7 @@ public class NodeManager {
     private int NodeConnectTimeout = 1000;
     private static Logger LOG = LoggerFactory.getLogger(NodeManager.class);
     private int maxThread = 20;
-    private int ChangeTimes = 0;
+    private int changeTimes = 0;
 
     public NodeManager(){
         ruler = new Ruler();
@@ -35,7 +35,7 @@ public class NodeManager {
         String nodes[] = nodeList.split(",");
         for (String node : nodes) {
             LOG.info("NodeManager add node : {}",node);
-            addNode(node,ChangeTimes);
+            addNode(node,changeTimes);
         }
     }
 
@@ -59,7 +59,7 @@ public class NodeManager {
      * Authers: tianyoupan
      */
     // TODO: 16-11-17 when many threads request this function,check the hashMap's situation.
-    public synchronized boolean addNode(String ipWithPort,int ChangeTimes) {
+    public synchronized boolean addNode(String ipWithPort,int changeTimes) {
         Node oldvalue = nodeInfoMap.get(ipWithPort);
         String args[] = ipWithPort.split(":");
         if (oldvalue == null) {
@@ -72,6 +72,7 @@ public class NodeManager {
             }
         } else {
                 /* Node has been added */
+                //update changeTimes
             LOG.warn("add a existed Node {}", ipWithPort);
         }
         return true;
@@ -97,32 +98,34 @@ public class NodeManager {
      * Output:
      * Authers: tianyoupan
      */
+    // TODO: 16-11-21 Test this method
     public void updateNodeMap(List<String> list){
         if(list.isEmpty() || list == null)
             return;
         LOG.info("ChangedNode Example : {} ",list.get(0));
-        ChangeTimes++;
+        changeTimes++;
         for (String s : list) {
-            nodeKeyTimeMap.putIfAbsent(s,ChangeTimes);
+            nodeKeyTimeMap.putIfAbsent(s,changeTimes);
         }
         //here use algorithm replace "deleteAll" opertaion.
         //1.define a map to save every node's changeTimes,like Generation,one by one.
-        //2.ChangeTimes means Generations,use this variable also can record NodeChangeFunction called times.
-        //3.ChangeTimes will be n or n+1,if n+1,that is "ChangedNode",if "n",is Origin Nodes.
+        //2.changeTimes means Generations,use this variable also can record NodeChangeFunction called times.
+        //3.changeTimes will be n or n+1,if n+1,that is "ChangedNode",if "n",is Origin Nodes.
         String oldEntry = null;
         for (Map.Entry<String, Integer> entry : nodeKeyTimeMap.entrySet()) {
             if(oldEntry != null){
                 nodeKeyTimeMap.remove(oldEntry);
                 oldEntry = null;
             }
+
             String node = entry.getKey();
             Integer generation = entry.getValue();
-            if(generation == ChangeTimes){
+            if(generation == changeTimes){
                 if(nodeInfoMap.get(node) == null){
-                    addNode(node,ChangeTimes);
+                    addNode(node,changeTimes);
                 }
             }
-            if(generation == (ChangeTimes - 1)){
+            if(generation == (changeTimes - 1)){
                 nodeInfoMap.remove(entry.getKey());
                 oldEntry = node;
             }

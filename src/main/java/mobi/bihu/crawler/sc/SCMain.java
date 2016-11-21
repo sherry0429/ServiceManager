@@ -1,11 +1,10 @@
-package mobi.bihu.crawler;
+package mobi.bihu.crawler.sc;
 
 /**
  * Created by tianyoupan on 16-11-16.
  */
 
 import mobi.bihu.crawler.sc.scnode.NodeManager;
-import mobi.bihu.crawler.sc.ServiceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

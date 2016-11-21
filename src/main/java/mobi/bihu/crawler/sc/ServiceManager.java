@@ -10,7 +10,6 @@ package mobi.bihu.crawler.sc;
 
 /** unprepared, do not use this package. thanks */
 
-import mobi.bihu.crawler.SCConfig;
 import mobi.bihu.crawler.sc.scnode.NodeManager;
 import mobi.bihu.crawler.sc.scservice.SCServiceHandler;
 import mobi.bihu.crawler.thrift.CenterManageService;

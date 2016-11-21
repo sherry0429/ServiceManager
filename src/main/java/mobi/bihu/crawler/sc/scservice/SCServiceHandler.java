@@ -3,7 +3,7 @@ package mobi.bihu.crawler.sc.scservice;
  * Created by tianyoupan on 16-11-18.
  */
 
-import mobi.bihu.crawler.SCConfig;
+import mobi.bihu.crawler.sc.SCConfig;
 import mobi.bihu.crawler.sc.ServiceManager;
 import mobi.bihu.crawler.thrift.CenterManageService;
 import org.apache.thrift.TException;
