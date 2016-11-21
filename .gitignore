@@ -6,5 +6,7 @@ out/
 .project
 .settings/
 bin/
+/downloader.js
 .DS_Store
 log/
+将删除 README.md

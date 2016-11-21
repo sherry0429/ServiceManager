@@ -22,16 +22,10 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
-        <module name="crawler-appapi" />
-        <module name="crawler-cc" />
-        <module name="crawler-common" />
         <module name="crawler-sc" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="crawler-appapi" target="1.8" />
-      <module name="crawler-cc" target="1.8" />
-      <module name="crawler-common" target="1.8" />
       <module name="crawler-sc" target="1.8" />
     </bytecodeTargetLevel>
   </component>

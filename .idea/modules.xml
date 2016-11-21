@@ -2,9 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/../crawler-appapi/crawler-appapi.iml" filepath="$PROJECT_DIR$/../crawler-appapi/crawler-appapi.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../crawler-cc/crawler-cc.iml" filepath="$PROJECT_DIR$/../crawler-cc/crawler-cc.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../crawler-common/crawler-common.iml" filepath="$PROJECT_DIR$/../crawler-common/crawler-common.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/crawler-sc.iml" filepath="$PROJECT_DIR$/.idea/crawler-sc.iml" />
     </modules>
   </component>
