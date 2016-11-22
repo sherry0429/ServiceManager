@@ -35,9 +35,17 @@ public class NodeManager {
      * Authers: tianyoupan
      */
     public void updateNodeMap(String serviceName, List<String> list) {
-        if (list == null || list.isEmpty())
+        if (list == null) {
             return;
-        if(managerMap.get(serviceName) != null){
+        }
+        //if all the nodes removed. remove the service in managerMap.
+        if(list.isEmpty()){
+            if(managerMap.containsKey(serviceName)){
+                managerMap.get(serviceName).clear();
+                managerMap.remove(serviceName);
+            }
+        }
+        if(managerMap.containsKey(serviceName)){
             managerMap.get(serviceName).clear();
         }
         Group group = new Group();
