@@ -1,13 +1,13 @@
-package mobi.bihu.crawler.sc.service;
+package mobi.bihu.crawler.sc.loadbalance;
 /**
  * Created by tianyoupan on 16-11-21.
  */
 
-import mobi.bihu.crawler.sc.ruler.Ruler;
-import mobi.bihu.crawler.sc.thrift.sc_client;
+import mobi.bihu.crawler.sc.thrift.SCClientService;
 import mobi.bihu.crawler.util.G;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
+import org.apache.thrift.protocol.TMultiplexedProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
@@ -16,28 +16,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Description:
  */
 
-public class Group {
+class Group {
     private static final Logger LOG = LoggerFactory.getLogger(Group.class);
     private ArrayList<Item>serviceList;
-    private int timeout;
+    private ConcurrentHashMap<Item,ComputerStatus>itemStatusMap;
+    private int timeout = 500;
     Ruler ruler;
 
 
-    public Group(){
+    Group(){
         ruler = new Ruler();
         serviceList = new ArrayList<>();
+        itemStatusMap = new ConcurrentHashMap<>();
     }
-    public void insert(Item item){
+    void insert(Item item){
         serviceList.add(item);
     }
 
-    public void clear(){
+    void clear(){
         serviceList.clear();
     }
 
@@ -45,34 +47,38 @@ public class Group {
         this.ruler = ruler;
     }
 
-    public String getSuitable(){
-        return ruler.findSuitable(serviceList);
+    String getSuitable(){
+        return ruler.findSuitable(itemStatusMap);
     }
 
-    public void update(){
+    void update(){
         for (Item s : serviceList) {
             String IP = s.getIP();
             int port = s.getPort();
-
-            TTransport transport = new TSocket(IP, port, timeout);
+            TTransport transport = new TSocket(IP,port, timeout);
             TProtocol protocol = new TBinaryProtocol(transport);
-            sc_client.Client client = new sc_client.Client(protocol);
+
+            // TMultiplexedProtocol
+            TMultiplexedProtocol multiplexedProtocol = new  TMultiplexedProtocol(protocol,"sc");
+            // 按名称获取服务端注册的service
+            SCClientService.Client client = new SCClientService.Client(multiplexedProtocol);
             try {
                 transport.open();
             } catch (TTransportException e) {
                 LOG.warn("TTransportException when isSave {}", e.getMessage());
             }
             try{
-                // TODO: 16-11-21 JSONRequest is empty.
-                String jsonResponse,jsonRequest="";
+                String jsonResponse=null,jsonRequest="simple";
                 jsonResponse = client.requestServiceSituation(jsonRequest);
-                LOG.info("doService ip : {} port {} response : {}",IP,port,jsonResponse);
                 if (jsonResponse != null) {
-                    HashMap map = G.gson().fromJson(jsonResponse, HashMap.class);
-                    s.setMemory(Integer.parseInt(map.get("Memory").toString()));
-                    // TODO: 16-11-17 here response,getValue maybe return null."not find this attribute",if this occur,this Node maybe have some questions.
+                    try {
+                        ComputerStatus status = G.gson().fromJson(jsonResponse, ComputerStatus.class);
+                        itemStatusMap.put(s,status);
+                    }catch (Exception e){
+                        LOG.warn("jsonResponse fromJson method failed. ip : {} , port : {}, msg : {}",IP,port,e.toString());
+                    }
                 }else{
-                    LOG.warn("TTransport do not receive response.ip : {}, port {}, response : {}",IP,port,jsonResponse);
+                    LOG.warn("TTransport response is null. ip : {}, port {}",IP,port);
                 }
             }catch (TException e) {
                 LOG.warn("TException when isSave {}", e.getMessage());

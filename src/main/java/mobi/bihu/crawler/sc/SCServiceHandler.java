@@ -1,11 +1,9 @@
-package mobi.bihu.crawler.sc.handler;
+package mobi.bihu.crawler.sc;
 /**
  * Created by tianyoupan on 16-11-18.
  */
 
-import mobi.bihu.crawler.sc.SCConfig;
-import mobi.bihu.crawler.sc.manager.ServiceManager;
-import mobi.bihu.crawler.sc.thrift.sc_server;
+import mobi.bihu.crawler.sc.thrift.SCService;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,16 +12,20 @@ import org.slf4j.LoggerFactory;
  * Description: thrift service,return suitalbe up:port
  */
 
-public class SCServiceHandler implements sc_server.Iface{
+class SCServiceHandler implements SCService.Iface{
 
     private static final Logger LOG = LoggerFactory.getLogger(SCServiceHandler.class);
-    private static ServiceManager manager;
+    private ServiceManager manager;
+    private SCConfig config;
 
-    private String serviceName = null;
+    //for test
+    SCServiceHandler(){
+        ;
+    }
 
-    public SCServiceHandler(SCConfig config,ServiceManager manager){
-        this.serviceName = config.getName();
+    SCServiceHandler(SCConfig config, ServiceManager manager){
         this.manager = manager;
+        this.config = config;
     }
 
     @Override
@@ -36,4 +38,12 @@ public class SCServiceHandler implements sc_server.Iface{
         }
         return null;
     }
+
+    @Override
+    public String registerService(String serviceName, String watchPath) throws TException {
+        manager.updateWatch(serviceName,watchPath);
+        return null;
+    }
+
+
 }

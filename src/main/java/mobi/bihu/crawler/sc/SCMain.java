@@ -4,8 +4,7 @@ package mobi.bihu.crawler.sc;
  * Created by tianyoupan on 16-11-16.
  */
 
-import mobi.bihu.crawler.sc.manager.NodeManager;
-import mobi.bihu.crawler.sc.manager.ServiceManager;
+import mobi.bihu.crawler.sc.loadbalance.NodeManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +37,6 @@ public class SCMain {
         }
         /** init Center */
         NodeManager nodeManager = new NodeManager();
-        nodeManager.init(config.getZkList());
         ServiceManager serviceManager = new ServiceManager(config, nodeManager);
         serviceManager.initManager();
 

@@ -13,7 +13,7 @@ import java.util.Properties;
  * Description:
  */
 
-public class SCConfig extends Config {
+class SCConfig extends Config {
     private static final Logger LOG = LoggerFactory.getLogger(SCConfig.class);
     private static final int THRIFT_THREAD_MAX = 200;
 
@@ -30,7 +30,7 @@ public class SCConfig extends Config {
 
     private String name;
 
-    public SCConfig(String conf) throws Exception {
+    SCConfig(String conf) throws Exception {
         super(conf);
     }
 
@@ -83,22 +83,11 @@ public class SCConfig extends Config {
         zkTimeout = zkTimeout_;
         zkNode = zkNode_;
 
-        //zookeeper new conf
-        zkList = properties.getProperty("zk_list");
-        LOG.info("Conf: get zklist {}", zkList);
-
         zkNodeList = properties.getProperty("zk_nodelist");
         LOG.info("Conf: get zkNodelist {}", zkNodeList);
-
-        name = properties.getProperty("name");
-        if (name == null) throw new Exception("Name must be configured");
-        LOG.info("Conf: get Name {}", name);
-
-
-
     }
 
-    public String getIP() {
+    String getIP() {
         return IP;
     }
 
@@ -106,7 +95,7 @@ public class SCConfig extends Config {
         this.IP = IP;
     }
 
-    public int getPort() {
+    int getPort() {
         return port;
     }
 
@@ -114,27 +103,23 @@ public class SCConfig extends Config {
         this.port = port;
     }
 
-    public int getThriftThreadMax() {
+    int getThriftThreadMax() {
         return thriftThreadMax;
     }
 
-    public String getZkServer() {
+    String getZkServer() {
         return zkServer;
     }
 
-    public int getZkTimeout() {
+    int getZkTimeout() {
         return zkTimeout;
     }
 
-    public String getZkNode() {
+    String getZkNode() {
         return zkNode;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getZkList() {
+    String getZkList() {
         return zkList;
     }
 
@@ -146,7 +131,7 @@ public class SCConfig extends Config {
         this.zkNode = zkNode;
     }
 
-    public String getZkNodeList() {
+    String getZkNodeList() {
         return zkNodeList;
     }
 }
