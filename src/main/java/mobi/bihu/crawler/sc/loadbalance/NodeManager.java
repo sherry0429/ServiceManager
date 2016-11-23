@@ -44,16 +44,16 @@ public class NodeManager {
                 managerMap.get(serviceName).clear();
                 managerMap.remove(serviceName);
             }
+            return;
         }
         if(managerMap.containsKey(serviceName)){
             managerMap.get(serviceName).clear();
         }
         Group group = new Group();
-        int index = 0;
         for (String s : list) {
-            String args[] = s.split(":");
-            Item item = new Item(args[0], Integer.parseInt(args[1]), serviceName + "-" + index);
-            index++;
+            String args[] = s.split(",");
+            String ipWithPorts[] = args[0].split(":");
+            Item item = new Item(ipWithPorts[0], Integer.parseInt(ipWithPorts[1]), args[1]);
             group.insert(item);
         }
         managerMap.putIfAbsent(serviceName,group);

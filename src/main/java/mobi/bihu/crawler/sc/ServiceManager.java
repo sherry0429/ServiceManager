@@ -81,6 +81,8 @@ class ServiceManager {
             System.exit(-1);
         }
         //every service have a watcher.
+
+        /*
         String[] nodelist = zkNodeList.split("\\|");
         for (String s : nodelist) {
             String[] args = s.split("@");
@@ -92,17 +94,25 @@ class ServiceManager {
             });
 
         }
+        */
         return true;
     }
 
-    void updateWatch(String serviceName,String watchPath){
-        zkclient.watchNodeChildrenChanged(watchPath, new ZKCallback.ChildrenChangedListener() {
-            @Override
-            public void onChildrenChanged(List<String> list) {
-                Nodes.updateNodeMap(serviceName, list);
-            }
-        });
-
+    boolean updateWatch(String serviceName,String watchPath){
+        LOG.info("new service register. Name : {}, Path : {}",serviceName,watchPath);
+        try {
+            zkclient.watchNodeChildrenChanged(watchPath, new ZKCallback.ChildrenChangedListener() {
+                @Override
+                public void onChildrenChanged(List<String> list) {
+                    LOG.info("node changed. Path : {}, list : {}",watchPath,list.toString());
+                    Nodes.updateNodeMap(serviceName, list);
+                }
+            });
+        }catch (Exception e){
+            LOG.warn("add Watch Failed. serviceName : {} watchPath : {} Msg: {}",serviceName,watchPath,e.toString());
+            return false;
+        }
+        return true;
     }
 
     boolean startManager() {
@@ -116,7 +126,7 @@ class ServiceManager {
         }
 
         //start thrift Server
-        SCServiceHandler handler = new SCServiceHandler(config, this);
+        SCServiceHandler handler = new SCServiceHandler(this);
         SCService.Processor<SCServiceHandler> processor = new SCService.Processor<SCServiceHandler>(handler);
         TServerSocket transport = null;
         try {

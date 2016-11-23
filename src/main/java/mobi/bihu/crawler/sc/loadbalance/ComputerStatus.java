@@ -8,16 +8,17 @@ package mobi.bihu.crawler.sc.loadbalance;
  */
 
 class ComputerStatus {
-    private int memory;
+    private String memory;
 
     public ComputerStatus(){
     }
 
-    public void setMemory(int memory) {
+    public void setMemory(String memory) {
         this.memory = memory;
     }
 
-    public int getMemory() {
-        return memory;
+    //String to Object, make use easily.
+    public double getMemory() {
+        return Double.parseDouble(memory);
     }
 }

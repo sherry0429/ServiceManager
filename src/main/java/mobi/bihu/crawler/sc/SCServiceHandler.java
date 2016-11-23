@@ -9,23 +9,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Description: thrift service,return suitalbe up:port
+ * Description: thrift service,return suitable up:port
  */
 
 class SCServiceHandler implements SCService.Iface{
 
     private static final Logger LOG = LoggerFactory.getLogger(SCServiceHandler.class);
     private ServiceManager manager;
-    private SCConfig config;
 
-    //for test
-    SCServiceHandler(){
-        ;
-    }
-
-    SCServiceHandler(SCConfig config, ServiceManager manager){
+    SCServiceHandler(ServiceManager manager){
         this.manager = manager;
-        this.config = config;
     }
 
     @Override
@@ -41,8 +34,13 @@ class SCServiceHandler implements SCService.Iface{
 
     @Override
     public String registerService(String serviceName, String watchPath) throws TException {
-        manager.updateWatch(serviceName,watchPath);
-        return null;
+        // TODO: 16-11-23 update config or not?
+        boolean result = manager.updateWatch(serviceName,watchPath);
+        if(result){
+            return serviceName + "@" + watchPath + " register Success.";
+        }else{
+            return serviceName + "@" + watchPath + " register Failed !";
+        }
     }
 
 

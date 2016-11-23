@@ -26,11 +26,11 @@ class Ruler {
     }
 
     String findSuitable(ConcurrentHashMap<Item,ComputerStatus> list){
-        int min = Integer.MAX_VALUE;
+        double min = Double.MAX_VALUE;
         String path = null;
         Item minItem = null;
         for (Map.Entry<Item, ComputerStatus> entry : list.entrySet()) {
-            int value = entry.getValue().getMemory();
+            double value = entry.getValue().getMemory();
             if(value < min){
                 min = value;
                 minItem = entry.getKey();
