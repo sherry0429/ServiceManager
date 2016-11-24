@@ -4,6 +4,7 @@ package mobi.bihu.crawler.sc.testthread;
  */
 
 import mobi.bihu.crawler.sc.thrift.SCService;
+import mobi.bihu.crawler.sc.thrift.SelectType;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
@@ -34,7 +35,8 @@ public class RequestThread extends Thread{
             e.printStackTrace();
         }
         try{
-            String Response = client.getSuitable("appapi");
+            SelectType type = SelectType.RANDOM;
+            String Response = client.getSuitable("appapi",type);
             System.out.println(Response);
         }catch (TException e) {
             e.printStackTrace();

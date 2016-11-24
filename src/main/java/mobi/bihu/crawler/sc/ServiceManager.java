@@ -10,6 +10,7 @@ package mobi.bihu.crawler.sc;
 
 import mobi.bihu.crawler.sc.loadbalance.NodeManager;
 import mobi.bihu.crawler.sc.thrift.SCService;
+import mobi.bihu.crawler.sc.thrift.SelectType;
 import mobi.bihu.crawler.zookeeper.ZKCallback;
 import mobi.bihu.crawler.zookeeper.ZKClient;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -27,7 +28,7 @@ import java.util.TimeZone;
 class ServiceManager {
     private static NodeManager Nodes;
     private static ZKClient zkclient;
-    private static int internal = 1000;
+    private static int internal = 5000;
     private String zkServer;
     private int zkTimeout;
     private SCConfig config;
@@ -146,8 +147,8 @@ class ServiceManager {
         return true;
     }
 
-    String getSuitableNode(String serviceName) {
-        return Nodes.getSuitable(serviceName);
+    String getSuitableNode(String serviceName,SelectType selectType) {
+        return Nodes.getSuitable(serviceName,selectType);
     }
 
 

@@ -26,12 +26,12 @@ class Group {
     private static final Logger LOG = LoggerFactory.getLogger(Group.class);
     private ArrayList<Item>serviceList;
     private ConcurrentHashMap<Item,ComputerStatus>itemStatusMap;
-    private int timeout = 500;
-    Ruler ruler;
+    //here if response data is big, time out need be added.
+    private int timeout = 2000;
+    Ruler ruler = null;
 
 
     Group(){
-        ruler = new Ruler();
         serviceList = new ArrayList<>();
         itemStatusMap = new ConcurrentHashMap<>();
     }
@@ -41,9 +41,11 @@ class Group {
 
     void clear(){
         serviceList.clear();
+        itemStatusMap.clear();
+        ruler = null;
     }
 
-    public void setRuler(Ruler ruler) {
+    void setRuler(Ruler ruler) {
         this.ruler = ruler;
     }
 
@@ -68,7 +70,7 @@ class Group {
                 LOG.warn("TTransportException when isSave {}", e.getMessage());
             }
             try{
-                String jsonResponse=null,jsonRequest="simple";
+                String jsonResponse=null,jsonRequest="all";
                 jsonResponse = client.requestServiceSituation(jsonRequest);
                 if (jsonResponse != null) {
                     try {

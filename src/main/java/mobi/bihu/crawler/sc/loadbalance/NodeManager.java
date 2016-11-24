@@ -3,12 +3,15 @@ package mobi.bihu.crawler.sc.loadbalance;
  * Created by tianyoupan on 16-11-15.
  */
 
+import mobi.bihu.crawler.sc.thrift.SelectType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static mobi.bihu.crawler.sc.thrift.SelectType.*;
 
 /**
  * Description: Machine Information Manager.
@@ -23,8 +26,32 @@ public class NodeManager {
         managerMap = new ConcurrentHashMap<>();
     }
 
-    public String getSuitable(String serviceName) {
-        // TODO: 16-11-16 example for use ruler
+    public String getSuitable(String serviceName,SelectType selectType) {
+        if(managerMap.get(serviceName).ruler == null){
+            Ruler ruler = null;
+            switch (selectType){
+                case MEMORYMORE:{
+                    ruler = new Ruler(MEMORYMORE);
+                    break;
+                }case CPUMORE:{
+                    ruler = new Ruler(CPUMORE);
+                    break;
+                }case DISKMORE:{
+                    ruler = new Ruler(DISKMORE);
+                    break;
+                }case NETUSGMORE:{
+                    ruler = new Ruler(NETUSGMORE);
+                    break;
+                }case AVERAGE:{
+                    ruler = new Ruler(AVERAGE);
+                    break;
+                }case RANDOM:{
+                    ruler = new Ruler(RANDOM);
+                    break;
+                }
+            }
+            managerMap.get(serviceName).setRuler(ruler);
+        }
         return managerMap.get(serviceName).getSuitable();
     }
 

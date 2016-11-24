@@ -9,6 +9,9 @@ package mobi.bihu.crawler.sc.loadbalance;
 
 class ComputerStatus {
     private String memory;
+    private String CPU;
+    private String disk;
+    private String netUsg;
 
     public ComputerStatus(){
     }
@@ -18,7 +21,19 @@ class ComputerStatus {
     }
 
     //String to Object, make use easily.
-    public double getMemory() {
+    double getMemory() {
         return Double.parseDouble(memory);
+    }
+
+    double getCPU() {
+        return Double.parseDouble(CPU);
+    }
+
+    double getDisk() {
+        return Double.parseDouble(disk);
+    }
+
+    double getNetUsg() {
+        return Double.parseDouble(netUsg);
     }
 }

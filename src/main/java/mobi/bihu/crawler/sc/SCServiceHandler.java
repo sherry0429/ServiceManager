@@ -4,6 +4,7 @@ package mobi.bihu.crawler.sc;
  */
 
 import mobi.bihu.crawler.sc.thrift.SCService;
+import mobi.bihu.crawler.sc.thrift.SelectType;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,11 +23,11 @@ class SCServiceHandler implements SCService.Iface{
     }
 
     @Override
-    public String getSuitable(String serviceName) throws TException {
+    public String getSuitable(String serviceName,SelectType selectType) throws TException {
         //request is appApiName,here are many kinds of appApisName
         switch (serviceName){
             case "appapi":{
-                return manager.getSuitableNode(serviceName);
+                return manager.getSuitableNode(serviceName,selectType);
             }
         }
         return null;
