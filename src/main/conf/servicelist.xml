@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<service>
+		<name>mobi.bihu.appapi</name>
+		<watchNode>/crawler/appApi_ty</watchNode>
+		<policy>RANDOM</policy>
+	</service>
+	<service>
+		<name>mobi.bihu.apptest</name>
+		<watchNode>/crawler/appTest_ty</watchNode>
+		<policy>RANDOM</policy>
+	</service>
+</root>
+
+

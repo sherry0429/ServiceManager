@@ -3,8 +3,8 @@ package mobi.bihu.crawler.sc;
  * Created by tianyoupan on 16-11-18.
  */
 
+import mobi.bihu.crawler.sc.loadbalance.ServiceManager;
 import mobi.bihu.crawler.sc.thrift.SCService;
-import mobi.bihu.crawler.sc.thrift.SelectType;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,26 +23,21 @@ class SCServiceHandler implements SCService.Iface{
     }
 
     @Override
-    public String getSuitable(String serviceName,SelectType selectType) throws TException {
+    public String getSuitable(String serviceName) throws TException {
         //request is appApiName,here are many kinds of appApisName
-        switch (serviceName){
-            case "appapi":{
-                return manager.getSuitableNode(serviceName,selectType);
-            }
-        }
-        return null;
+        return manager.getSuitable(serviceName);
     }
 
     @Override
-    public String registerService(String serviceName, String watchPath) throws TException {
-        // TODO: 16-11-23 update config or not?
-        boolean result = manager.updateWatch(serviceName,watchPath);
+    public String registerService(String serviceName, String watchNode, String selectType) throws TException {
+        boolean result = manager.updateWatch(serviceName,watchNode,selectType);
         if(result){
-            return serviceName + "@" + watchPath + " register Success.";
+            return serviceName + "@" + watchNode + " Ruler : " + selectType + " register Success.";
         }else{
-            return serviceName + "@" + watchPath + " register Failed !";
+            return serviceName + "@" + watchNode + " Ruler : " + selectType + " register Failed !";
         }
     }
+
 
 
 }

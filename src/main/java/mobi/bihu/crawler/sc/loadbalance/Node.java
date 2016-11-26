@@ -7,12 +7,12 @@ package mobi.bihu.crawler.sc.loadbalance;
  * Description:
  */
 
-class Item {
-    public String name;
+class Node {
+    private String name;
     private String IP;
     private int port;
 
-    Item(String ip,int port,String name){
+    Node(String ip, int port, String name){
         this.IP = ip;
         this.port = port;
         this.name = name;
@@ -22,7 +22,7 @@ class Item {
         this.name = name;
     }
 
-    public String getName() {
+    String getName() {
         return name;
     }
 

@@ -3,15 +3,6 @@ package mobi.bihu.crawler.sc.loadbalance;
  * Created by tianyoupan on 16-11-21.
  */
 
-import mobi.bihu.crawler.sc.thrift.SCClientService;
-import mobi.bihu.crawler.util.G;
-import org.apache.thrift.TException;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.apache.thrift.protocol.TMultiplexedProtocol;
-import org.apache.thrift.protocol.TProtocol;
-import org.apache.thrift.transport.TSocket;
-import org.apache.thrift.transport.TTransport;
-import org.apache.thrift.transport.TTransportException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,21 +13,20 @@ import java.util.concurrent.ConcurrentHashMap;
  * Description:
  */
 
-class Group {
-    private static final Logger LOG = LoggerFactory.getLogger(Group.class);
-    private ArrayList<Item>serviceList;
-    private ConcurrentHashMap<Item,ComputerStatus>itemStatusMap;
+public class NodesGroup {
+    private static final Logger LOG = LoggerFactory.getLogger(NodesGroup.class);
+    private ArrayList<Node>serviceList;
+    private ConcurrentHashMap<Node,ComputerStatus>itemStatusMap;
     //here if response data is big, time out need be added.
     private int timeout = 2000;
-    Ruler ruler = null;
+    private Ruler ruler = null;
 
-
-    Group(){
+    NodesGroup(){
         serviceList = new ArrayList<>();
         itemStatusMap = new ConcurrentHashMap<>();
     }
-    void insert(Item item){
-        serviceList.add(item);
+    void insert(Node node){
+        serviceList.add(node);
     }
 
     void clear(){
@@ -45,16 +35,36 @@ class Group {
         ruler = null;
     }
 
+    boolean isEmpty(){
+        return serviceList.isEmpty();
+    }
+
     void setRuler(Ruler ruler) {
         this.ruler = ruler;
     }
 
     String getSuitable(){
+        //如果iteamStatusMap不可用 按照serviceList，返回RANDOM
+        if(itemStatusMap == null || itemStatusMap.isEmpty() || ruler.getType() == "RANDOM"){
+            return ruler.findMinByRandom(serviceList);
+        }
         return ruler.findSuitable(itemStatusMap);
     }
 
+    public String[] getAllNodes(){
+        String[] nodes = new String[serviceList.size()];
+        int index = 0;
+        for (Node node : serviceList) {
+            nodes[index++]= node.getIP() + ":" + node.getPort() + "," + node.getName();
+        }
+        return nodes;
+    }
+
     void update(){
-        for (Item s : serviceList) {
+        return;
+        /*
+        for (Node s : serviceList) {
+
             String IP = s.getIP();
             int port = s.getPort();
             TTransport transport = new TSocket(IP,port, timeout);
@@ -87,6 +97,10 @@ class Group {
             }finally {
                 transport.close();
             }
+
         }
+        */
     }
+
+
 }

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+    <property file="conf/email.properties"/>
+
     <appender name="console-error" class="ch.qos.logback.core.ConsoleAppender">
         <target>System.out</target>
         <encoder>
@@ -13,24 +15,25 @@
     </appender>
 
     <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>log/app_api.log</file>
+        <file>log/sc.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>log/app_api.log.%d{yyyyMMdd}.zip</fileNamePattern>
-            <maxHistory>30</maxHistory>
+            <fileNamePattern>log/sc.log.%d{yyyyMMdd}.zip</fileNamePattern>
+            <maxHistory>1</maxHistory>
         </rollingPolicy>
         <encoder>
             <pattern>%date %-5level [%X{traceId}] %file:%line ## %msg%n</pattern>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
-            <onMismatch>DENY</onMismatch>
+            <!-- 如果使用logback 那么此处需要注释 否则出现ERROR 如果使用log4j2 那么此处需要解除注释-->
+            <!--<onMismatch>DENY</onMismatch>-->
         </filter>
     </appender>
 
     <appender name="file_debug" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>log/debug_api.log</file>
+        <file>log/debug_sc.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>log/debug_api.log.%d{yyyyMMdd}.zip</fileNamePattern>
+            <fileNamePattern>log/debug_sc.log.%d{yyyyMMdd}.zip</fileNamePattern>
             <maxHistory>5</maxHistory>
         </rollingPolicy>
         <encoder>
@@ -65,6 +68,11 @@
             <OnMismatch>DENY</OnMismatch>
         </filter>
     </appender>
+
+    <logger name="org.apache" level="WARN" additivity="false">
+        <appender-ref ref="file" />
+        <appender-ref ref="file_debug" />
+    </logger>
 
     <logger name="mobi.bihu.crawler" level="DEBUG" />
 

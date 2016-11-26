@@ -5,6 +5,7 @@ package mobi.bihu.crawler.sc.loadbalance;
 
 /**
  * Description:
+ * LoadInfo
  */
 
 class ComputerStatus {

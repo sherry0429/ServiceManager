@@ -4,9 +4,14 @@ package mobi.bihu.crawler.sc; /**
 
 import mobi.bihu.crawler.config.Config;
 import mobi.bihu.crawler.util.IPUtils;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -24,14 +29,41 @@ class SCConfig extends Config {
 
     private String zkServer;
     private int zkTimeout;
-    private String zkNode;
-    private String zkList;//zkServerName:zkNode1,zkNode2,zkNode3.....
-    private String zkNodeList;
+    private String jmxEnabled;
+    private String[] initServiceList;
 
-    private String name;
-
-    SCConfig(String conf) throws Exception {
+    SCConfig(String conf,String xml) throws Exception {
         super(conf);
+        parseXML(xml);
+    }
+
+    private void parseXML(String xml){
+        SAXReader reader = new SAXReader();
+        File file = new File(xml);
+        try {
+            Document document = reader.read(file);
+            Element root = document.getRootElement();
+            List childElements = root.elements("service");
+            int index = 0;
+            initServiceList = new String[childElements.size()];
+            for (Object childElement : childElements) {
+                Element elm = (Element)childElement;
+                List elmList = elm.elements();
+                StringBuilder builder = new StringBuilder();
+                Element name = (Element)elmList.get(0);
+                Element watchNode = (Element)elmList.get(1);
+                Element policy = (Element)elmList.get(2);
+                builder.append(name.getTextTrim());
+                builder.append(",").append(watchNode.getTextTrim());
+                builder.append(",").append(policy.getTextTrim());
+                initServiceList[index] = builder.toString();
+                LOG.info("init services by XML : info : {}",initServiceList[index]);
+                index++;
+            }
+        }catch (Exception e){
+            LOG.warn("XML parse failed. path : {}",xml);
+        }
+
     }
 
     @Override
@@ -78,13 +110,26 @@ class SCConfig extends Config {
         }
 
         //zookeeper config
-        parseZookeeper(properties);
-        zkServer = zkServer_;
-        zkTimeout = zkTimeout_;
-        zkNode = zkNode_;
+        //parseZookeeper(properties);
 
-        zkNodeList = properties.getProperty("zk_nodelist");
-        LOG.info("Conf: get zkNodelist {}", zkNodeList);
+        zkServer = properties.getProperty("zk_server");
+        if(zkServer == null) {
+            throw new Exception("zk_server must be configured");
+        } else {
+            LOG.info("Conf: get zk_server {}", zkServer);
+            String zkTimeoutStr = properties.getProperty("zk_timeout");
+            if (zkTimeoutStr != null) {
+                try {
+                    zkTimeout = Integer.parseInt(zkTimeoutStr);
+                    LOG.info("Conf: get zk_timeout {}", zkTimeoutStr);
+                } catch (NumberFormatException var4) {
+                    LOG.warn("Cannot parse zk_timeout({}), use default({}) instead", zkTimeoutStr, 3000);
+                    this.zkTimeout_ = 3000;
+                }
+            }
+        }
+
+        jmxEnabled = properties.getProperty("jmx_enabled");
     }
 
     String getIP() {
@@ -115,23 +160,11 @@ class SCConfig extends Config {
         return zkTimeout;
     }
 
-    String getZkNode() {
-        return zkNode;
+    public String getJmxEnabled() {
+        return jmxEnabled;
     }
 
-    String getZkList() {
-        return zkList;
-    }
-
-    public void setZkList(String zkList) {
-        this.zkList = zkList;
-    }
-
-    public void setZkNode(String zkNode) {
-        this.zkNode = zkNode;
-    }
-
-    String getZkNodeList() {
-        return zkNodeList;
+    public String[] getInitServiceList() {
+        return initServiceList;
     }
 }
