@@ -22,7 +22,7 @@ public class RequestThreadTest {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                TTransport transport = new TSocket("192.168.31.103",10151, 3000);
+                TTransport transport = new TSocket("192.168.31.14",10151, 3000);
                 TProtocol protocol = new TBinaryProtocol(transport);
 
                 // TMultiplexedProtocol
@@ -34,7 +34,7 @@ public class RequestThreadTest {
                     e.printStackTrace();
                 }
                 try{
-                    String Response = client.getSuitable("appapi");
+                    String Response = client.getSuitable("mobi.bihu.appte123st");
                     System.out.println(Response);
                 }catch (TException e) {
                     e.printStackTrace();

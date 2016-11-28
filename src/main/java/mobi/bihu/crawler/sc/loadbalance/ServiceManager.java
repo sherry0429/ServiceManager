@@ -3,7 +3,7 @@ package mobi.bihu.crawler.sc.loadbalance;
  * Created by tianyoupan on 16-11-15.
  */
 
-import mobi.bihu.crawler.sc.loadbalance.JMX.ServiceManagerMirror;
+import mobi.bihu.crawler.sc.loadbalance.jmx.ServiceManagerMirror;
 import mobi.bihu.crawler.util.G;
 import mobi.bihu.crawler.zookeeper.ZKCallback;
 import mobi.bihu.crawler.zookeeper.ZKClient;
@@ -155,23 +155,13 @@ public class ServiceManager{
      * Output:
      * Authers: tianyoupan
      */
-    private void updateNodeMap(String serviceName, String watchPath, String selectType, List<String> list) {
-        if (list == null) {
+    private synchronized void updateNodeMap(String serviceName, String watchPath, String selectType, List<String> list) {
+        if(list == null)
             return;
-        }
-
-        if (list.isEmpty()) {
-            if (managerMap.containsKey(serviceName)) {
-                managerMap.get(serviceName).clear();
-                managerMap.remove(serviceName);
-                if (serviceNodeMap.containsKey(serviceName)) {
-                    serviceNodeMap.remove(serviceName);
-                }
-            }
-            return;
-        }
         if (managerMap.containsKey(serviceName)) {
             managerMap.get(serviceName).clear();
+            managerMap.remove(serviceName);
+            serviceNodeMap.remove(serviceName);
         }
         NodesGroup nodesGroup = new NodesGroup();
         nodesGroup.setRuler(switchRuler(selectType));
@@ -181,8 +171,8 @@ public class ServiceManager{
             Node node = new Node(ipWithPorts[0], Integer.parseInt(ipWithPorts[1]), args[1]);
             nodesGroup.insert(node);
         }
-        managerMap.putIfAbsent(serviceName, nodesGroup);
-        serviceNodeMap.putIfAbsent(serviceName, watchPath);
+        managerMap.put(serviceName, nodesGroup);
+        serviceNodeMap.put(serviceName,watchPath);
     }
 
     /**

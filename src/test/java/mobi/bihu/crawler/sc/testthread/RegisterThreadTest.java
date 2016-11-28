@@ -7,7 +7,6 @@ import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
-import org.junit.Test;
 
 /**
  * Created by tianyoupan on 16-11-23.
@@ -17,7 +16,7 @@ public class RegisterThreadTest {
     //how to use:
     //1.run the SCMain first
     //2.run this test
-    @Test
+//    @Test
     public void run() throws Exception {
 
         Thread thread = new Thread(new Runnable() {

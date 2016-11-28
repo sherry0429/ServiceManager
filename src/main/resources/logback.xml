@@ -18,7 +18,7 @@
         <file>log/sc.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>log/sc.log.%d{yyyyMMdd}.zip</fileNamePattern>
-            <maxHistory>1</maxHistory>
+            <maxHistory>30</maxHistory>
         </rollingPolicy>
         <encoder>
             <pattern>%date %-5level [%X{traceId}] %file:%line ## %msg%n</pattern>
