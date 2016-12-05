@@ -136,10 +136,10 @@ public class ServiceManager{
         return true;
     }
 
-    public String getSuitable(String serviceName) {
+    public String getService(String serviceName) {
         if(managerMap.containsKey(serviceName)){
             if(!managerMap.get(serviceName).isEmpty()) {
-                return managerMap.get(serviceName).getSuitable();
+                return managerMap.get(serviceName).getService();
             }
             else{
                 return G.gson().toJson(new ErrorInfo("Service NodeList is empty","2"));

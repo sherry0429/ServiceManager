@@ -19,31 +19,43 @@ public class RequestThreadTest {
     //2.run this test
     @Test
     public void run() throws Exception {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                TTransport transport = new TSocket("192.168.31.14",10151, 3000);
-                TProtocol protocol = new TBinaryProtocol(transport);
+        Thread thread[] = new Thread[2];
+        for (Thread thread1 : thread) {
+            thread1 = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while(true){
+                        TTransport transport = new TSocket("192.168.31.14",10120, 3000);
+                        TProtocol protocol = new TBinaryProtocol(transport);
 
-                // TMultiplexedProtocol
-                // 按名称获取服务端注册的service
-                SCService.Client client = new SCService.Client(protocol);
-                try {
-                    transport.open();
-                } catch (TTransportException e) {
-                    e.printStackTrace();
+                        // TMultiplexedProtocol
+                        // 按名称获取服务端注册的service
+                        SCService.Client client = new SCService.Client(protocol);
+                        try {
+                            transport.open();
+                        } catch (TTransportException e) {
+                            e.printStackTrace();
+                        }
+                        try{
+                            //long startTime = System.currentTimeMillis();
+                            String Response = client.getService("mobi.bihu.appapi");
+                            System.out.println(Response);
+                            //long endTime = System.currentTimeMillis();
+                        }catch (TException e) {
+                            e.printStackTrace();
+                        }finally {
+                            transport.close();
+                        }
+                        try {
+                            Thread.sleep(2000);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
                 }
-                try{
-                    String Response = client.getSuitable("mobi.bihu.appte123st");
-                    System.out.println(Response);
-                }catch (TException e) {
-                    e.printStackTrace();
-                }finally {
-                    transport.close();
-                }
-            }
-        });
-        thread.start();
+            });
+            thread1.start();
+        }
         while(true)
         {
 

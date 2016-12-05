@@ -23,9 +23,9 @@ class SCServiceHandler implements SCService.Iface{
     }
 
     @Override
-    public String getSuitable(String serviceName) throws TException {
+    public String getService(String serviceName) throws TException {
         //request is appApiName,here are many kinds of appApisName
-        return manager.getSuitable(serviceName);
+        return manager.getService(serviceName);
     }
 
     @Override

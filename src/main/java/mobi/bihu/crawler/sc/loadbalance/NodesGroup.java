@@ -43,7 +43,7 @@ public class NodesGroup {
         this.ruler = ruler;
     }
 
-    String getSuitable(){
+    String getService(){
         //如果iteamStatusMap不可用 按照serviceList，返回RANDOM
         if(itemStatusMap == null || itemStatusMap.isEmpty() || ruler.getType() == "RANDOM"){
             return ruler.findMinByRandom(serviceList);

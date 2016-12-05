@@ -76,7 +76,8 @@ public class SCMain {
 
         //start thrift Server
         SCServiceHandler handler = new SCServiceHandler(manager);
-        SCService.Processor<SCServiceHandler> processor = new SCService.Processor<SCServiceHandler>(handler);
+        SCService
+                .Processor<SCServiceHandler> processor = new SCService.Processor<SCServiceHandler>(handler);
         TServerSocket transport = null;
         try {
             transport = new TServerSocket(config.getPort());

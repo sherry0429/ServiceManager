@@ -16,7 +16,7 @@ public class RegisterThreadTest {
     //how to use:
     //1.run the SCMain first
     //2.run this test
-//    @Test
+    //@Test
     public void run() throws Exception {
 
         Thread thread = new Thread(new Runnable() {
