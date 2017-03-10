@@ -1,9 +1,4 @@
 package mobi.bihu.crawler.sc;
-
-/**
- * Created by tianyoupan on 16-11-16.
- */
-
 import mobi.bihu.crawler.sc.loadbalance.ServiceManager;
 import mobi.bihu.crawler.sc.thrift.SCService;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -21,35 +16,33 @@ import java.util.TimeZone;
 
 /**
  * Description:
+ * 同一种服务，需要运行在多台机器上，SC告诉请求服务的机器应该运行在哪台机器上
  */
 
 public class SCMain {
     private static final Logger LOG = LoggerFactory.getLogger(SCMain.class);
     private static final String DEFAULT_CONF_FILE = "conf/sc.conf";
-    private static final String DEFAULT_XML_FILE = "conf/servicelist.xml";
 
     static {
         TimeZone.setDefault(TimeZone.getTimeZone("PRC"));
     }
 
     public static void main(String[] args) {
-
         String conf = DEFAULT_CONF_FILE;
-        String xml = DEFAULT_XML_FILE;
         if (args.length >= 1) {
             conf = args[0];
         }
         SCConfig config = null;
         try {
-            config = new SCConfig(conf,xml);
+            config = new SCConfig(conf);
         } catch (Exception e) {
             LOG.error("Fail to parse conf file {}, {}", conf, e.getMessage());
             System.exit(-1);
         }
 
-        //Start Manager
+        //Start Managers
         ServiceManager manager = new ServiceManager();
-        boolean status = manager.StartManager(config.getZkServer(),config.getZkTimeout(),config.getInitServiceList());
+        boolean status = manager.StartManager(config.getZkServer(),config.getZkTimeOut(),config.getServerList());
         if (!status) {
             LOG.error("ServiceManager start failed.");
             System.exit(-1);
@@ -57,7 +50,7 @@ public class SCMain {
         LOG.info("ServiceManager start success.");
 
 
-        if(config.getJmxEnabled().equals("true")){
+        if(config.getJMXEnabled().equals("true")){
             //start JMX
             try {
 
@@ -80,7 +73,7 @@ public class SCMain {
                 .Processor<SCServiceHandler> processor = new SCService.Processor<SCServiceHandler>(handler);
         TServerSocket transport = null;
         try {
-            transport = new TServerSocket(config.getPort());
+            transport = new TServerSocket(config.getServerPort());
         } catch (TTransportException e) {
             LOG.error("TTransportException: {}", e.getMessage());
             System.exit(-1);

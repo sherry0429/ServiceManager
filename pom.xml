@@ -56,11 +56,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>mobi.bihu.crawler</groupId>
-            <artifactId>crawler-common</artifactId>
-            <version>0.2.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.7.6</version>

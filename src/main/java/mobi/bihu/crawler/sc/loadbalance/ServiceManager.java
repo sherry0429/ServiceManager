@@ -3,6 +3,7 @@ package mobi.bihu.crawler.sc.loadbalance;
  * Created by tianyoupan on 16-11-15.
  */
 
+import mobi.bihu.crawler.sc.ZKClient;
 import mobi.bihu.crawler.sc.loadbalance.jmx.ServiceManagerMirror;
 import mobi.bihu.crawler.util.G;
 import mobi.bihu.crawler.zookeeper.ZKCallback;
