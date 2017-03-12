@@ -1,10 +1,10 @@
-package mobi.bihu.crawler.sc.loadbalance;
+package servicemanager.loadbalance;
 /**
  * Created by tianyoupan on 16-11-15.
  */
 
-import mobi.bihu.crawler.sc.ZKClient;
-import mobi.bihu.crawler.sc.loadbalance.jmx.ServiceManagerMirror;
+import servicemanager.ZKClient;
+import servicemanager.loadbalance.jmx.ServiceManagerMirror;
 import mobi.bihu.crawler.util.G;
 import mobi.bihu.crawler.zookeeper.ZKCallback;
 import mobi.bihu.crawler.zookeeper.ZKClient;
@@ -96,6 +96,7 @@ public class ServiceManager{
     public boolean updateWatch(String serviceName, String watchPath, String selectType) {
         LOG.info("new service register. Name : {}, Path : {} Type : {}", serviceName, watchPath,selectType);
         try {
+            // TODO: 2017/3/12 here need think a better way
             zkClient.watchNodeChildrenChanged(watchPath, new ZKCallback.ChildrenChangedListener() {
                 @Override
                 public void onChildrenChanged(List<String> list) {

@@ -1,10 +1,10 @@
-package mobi.bihu.crawler.sc;
+package servicemanager;
 /**
  * Created by tianyoupan on 16-11-18.
  */
 
-import mobi.bihu.crawler.sc.loadbalance.ServiceManager;
-import mobi.bihu.crawler.sc.thrift.SCService;
+import servicemanager.loadbalance.ServiceManager;
+import servicemanager.thrift.SCService;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
  * Description: thrift service,return suitable up:port
  */
 
-class SCServiceHandler implements SCService.Iface{
+class SCServiceHandler implements SCService.Iface {
 
     private static final Logger LOG = LoggerFactory.getLogger(SCServiceHandler.class);
     private ServiceManager manager;

@@ -41,34 +41,6 @@
         </encoder>
     </appender>
 
-    <appender name="email" class="ch.qos.logback.classic.net.SMTPAppender">
-        <smtpHost>${smtpHost}</smtpHost>
-        <smtpPort>${smtpPort}</smtpPort>
-        <username>${username}</username>
-        <password>${password}</password>
-        <SSL>${SSL}</SSL>
-        <asynchronousSending>true</asynchronousSending>
-        <to>${email_to}</to>
-        <from>${email_from}</from>
-        <subject>${email_subject}</subject>
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <pattern>${email_body}</pattern>
-        </layout>
-        <evaluator class="ch.qos.logback.classic.boolex.OnMarkerEvaluator">
-            <marker>${marker}</marker>
-        </evaluator>
-        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
-            <evaluator class="ch.qos.logback.classic.boolex.JaninoEventEvaluator">
-                <expression>
-                    marker != null &amp;&amp;
-                    marker.contains("EMAIL")
-                </expression>
-            </evaluator>
-            <OnMatch>ACCEPT</OnMatch>
-            <OnMismatch>DENY</OnMismatch>
-        </filter>
-    </appender>
-
     <logger name="org.apache" level="WARN" additivity="false">
         <appender-ref ref="file" />
         <appender-ref ref="file_debug" />

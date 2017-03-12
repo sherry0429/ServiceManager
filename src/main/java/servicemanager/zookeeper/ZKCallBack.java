@@ -1,4 +1,4 @@
-package mobi.bihu.crawler.sc.zookeeper;
+package servicemanager.zookeeper;
 
 /**
  * Author:TianYouPan

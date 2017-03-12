@@ -1,6 +1,6 @@
-package mobi.bihu.crawler.sc;
+package servicemanager;
 
-import mobi.bihu.crawler.sc.zookeeper.ZKCallBack;
+import servicemanager.zookeeper.ZKCallBack;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
@@ -44,6 +44,8 @@ public class ZKClient {
             LOG.warn("Zookeeper init failed. Msg : {}",e.getMessage());
         }
     }
+
+
 
 
 }

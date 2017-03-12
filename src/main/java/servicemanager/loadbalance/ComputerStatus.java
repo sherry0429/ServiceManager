@@ -1,4 +1,4 @@
-package mobi.bihu.crawler.sc.loadbalance;
+package servicemanager.loadbalance;
 /**
  * Created by tianyoupan on 16-11-22.
  */

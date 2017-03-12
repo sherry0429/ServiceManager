@@ -1,6 +1,6 @@
-package mobi.bihu.crawler.sc;
-import mobi.bihu.crawler.sc.loadbalance.ServiceManager;
-import mobi.bihu.crawler.sc.thrift.SCService;
+package servicemanager;
+import servicemanager.loadbalance.ServiceManager;
+import servicemanager.thrift.SCService;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadPoolServer;
@@ -69,8 +69,7 @@ public class SCMain {
 
         //start thrift Server
         SCServiceHandler handler = new SCServiceHandler(manager);
-        SCService
-                .Processor<SCServiceHandler> processor = new SCService.Processor<SCServiceHandler>(handler);
+        SCService.Processor<SCServiceHandler> processor = new SCService.Processor<SCServiceHandler>(handler);
         TServerSocket transport = null;
         try {
             transport = new TServerSocket(config.getServerPort());

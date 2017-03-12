@@ -4,7 +4,7 @@
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-package mobi.bihu.crawler.sc.thrift;
+package servicemanager.thrift;
 
 import org.apache.thrift.TException;
 import org.apache.thrift.async.AsyncMethodCallback;

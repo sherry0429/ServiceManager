@@ -1,9 +1,9 @@
-package mobi.bihu.crawler.sc.loadbalance.jmx;
+package servicemanager.loadbalance.jmx;
 /**
  * Created by tianyoupan on 16-11-25.
  */
 
-import mobi.bihu.crawler.sc.loadbalance.NodesGroup;
+import servicemanager.loadbalance.NodesGroup;
 
 import java.util.Arrays;
 import java.util.Map;

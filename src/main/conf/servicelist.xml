@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
 	<service>
-		<name>mobi.bihu.appapi</name>
-		<watchNode>/crawler/appApi_ty</watchNode>
+		<name>appapi</name>
+		<watchNode>/test</watchNode>
 		<policy>RANDOM</policy>
 	</service>
 	<service>
-		<name>mobi.bihu.apptest</name>
-		<watchNode>/crawler/appTest_ty</watchNode>
+		<name>apptest</name>
+		<watchNode>/test</watchNode>
 		<policy>RANDOM</policy>
 	</service>
 </root>

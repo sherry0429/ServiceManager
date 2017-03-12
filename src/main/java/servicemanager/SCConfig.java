@@ -1,4 +1,4 @@
-package mobi.bihu.crawler.sc; /**
+package servicemanager; /**
  * Created by tianyoupan on 16-11-16.
  */
 
