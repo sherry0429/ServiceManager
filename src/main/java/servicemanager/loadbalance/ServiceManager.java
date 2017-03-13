@@ -144,6 +144,7 @@ public class ServiceManager{
                 return managerMap.get(serviceName).getService();
             }
             else{
+                // TODO: 2017/3/13 use fastJson
                 return G.gson().toJson(new ErrorInfo("Service NodeList is empty","2"));
             }
         }else{
