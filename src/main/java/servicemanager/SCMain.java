@@ -49,24 +49,6 @@ public class SCMain {
         }
         LOG.info("ServiceManager start success.");
 
-
-        if(config.getJMXEnabled().equals("true")){
-            //start JMX
-            try {
-
-                // Get the Platform MBean Server
-                MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-
-                // Construct the ObjectName for the MBean we will register
-                ObjectName name = new ObjectName("mobi.bihu.crawler.sc.loadbalance.JMX:type=ServiceManagerMirror");
-
-                // Register the Hello World MBean
-                mbs.registerMBean(manager.getMirror(), name);
-            }catch (Exception e){
-                LOG.warn("JMX start failed, msg : {}",e.toString());
-            }
-        }
-
         //start thrift Server
         SCServiceHandler handler = new SCServiceHandler(manager);
         SCService.Processor<SCServiceHandler> processor = new SCService.Processor<SCServiceHandler>(handler);
