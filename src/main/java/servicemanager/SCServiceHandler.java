@@ -30,7 +30,7 @@ class SCServiceHandler implements SCService.Iface {
 
     @Override
     public String registerService(String serviceName, String watchNode, String selectType) throws TException {
-        boolean result = manager.updateWatch(serviceName,watchNode,selectType);
+        boolean result = manager.registerService(serviceName,watchNode,selectType);
         if(result){
             return serviceName + "@" + watchNode + " Ruler : " + selectType + " register Success.";
         }else{

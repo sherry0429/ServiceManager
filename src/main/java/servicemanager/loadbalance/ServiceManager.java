@@ -5,11 +5,9 @@ package servicemanager.loadbalance;
 
 import servicemanager.ZKClient;
 import servicemanager.loadbalance.jmx.ServiceManagerMirror;
-import mobi.bihu.crawler.util.G;
-import mobi.bihu.crawler.zookeeper.ZKCallback;
-import mobi.bihu.crawler.zookeeper.ZKClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import servicemanager.zookeeper.ZKCallBack;
 
 import java.io.IOException;
 import java.util.List;
@@ -20,9 +18,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * Description: Machine Information Manager.
  */
 
-public class ServiceManager{
+public class ServiceManager implements ZKCallBack{
     private static ConcurrentHashMap<String, NodesGroup> managerMap;
-    private static ConcurrentHashMap<String, String> serviceNodeMap;//serviceName - Node
+    private static ConcurrentHashMap<String, String> serviceNodeMap;//serviceName - Node\
     private int NodeConnectTimeout = 1000;
     private static int internal = 5000;
     private static Logger LOG = LoggerFactory.getLogger(ServiceManager.class);
@@ -30,6 +28,39 @@ public class ServiceManager{
     private Thread cpThread;
     private ZKClient zkClient;
     private ServiceManagerMirror mirror;
+    private String rulerType = "";
+
+    @Override
+    public void onChildAdd(String path, String data) {
+        String datas[] = data.split(",");
+        if (managerMap.containsKey(datas[2])) {
+            managerMap.get(datas[2]).clear();
+            managerMap.remove(datas[2]);
+            serviceNodeMap.remove(datas[2]);
+        }
+        NodesGroup nodesGroup = new NodesGroup();
+        nodesGroup.setRuler(switchRuler(rulerType));
+
+        Node node = new Node(datas[0], Integer.parseInt(datas[1]), datas[2]);
+        nodesGroup.insert(node);
+        managerMap.put(datas[2], nodesGroup);
+        serviceNodeMap.put(datas[2],path);
+    }
+
+    @Override
+    public void onChildDelete(String path, String data) {
+        String datas[] = data.split(",");
+        if (managerMap.containsKey(datas[2])) {
+            managerMap.get(datas[2]).clear();
+            managerMap.remove(datas[2]);
+            serviceNodeMap.remove(datas[2]);
+        }
+
+    }
+
+    @Override
+    public void onChildUpdate(String path, String data) {
+    }
 
     /**
      * Description: Main thread make a loop,check machine every times,update Machine infos.
@@ -93,29 +124,11 @@ public class ServiceManager{
         return ruler;
     }
 
-    public boolean updateWatch(String serviceName, String watchPath, String selectType) {
-        LOG.info("new service register. Name : {}, Path : {} Type : {}", serviceName, watchPath,selectType);
-        try {
-            // TODO: 2017/3/12 here need think a better way
-            zkClient.watchNodeChildrenChanged(watchPath, new ZKCallback.ChildrenChangedListener() {
-                @Override
-                public void onChildrenChanged(List<String> list) {
-                    LOG.info("node changed. Path : {}, list : {}", watchPath, list.toString());
-                    updateNodeMap(serviceName, watchPath, selectType, list);
-                }
-            });
-        } catch (Exception e) {
-            LOG.warn("add Watch Failed. serviceName : {} watchPath : {} Msg: {}", serviceName, watchPath, e.toString());
-            return false;
-        }
-        return true;
-    }
-
     public boolean StartManager(String zkServer,int zkTimeout,String []initServiceList) {
         zkClient = null;
         try {
-            zkClient = new ZKClient(zkServer, zkTimeout);
-        } catch (IOException e) {
+            zkClient = new ZKClient(zkServer);
+        } catch (Exception e) {
             LOG.error("Zookeeper start failed. msg : {}",e.toString());
             System.exit(-1);
         }
@@ -123,7 +136,8 @@ public class ServiceManager{
         //init Watch
         for (String s : initServiceList) {
             String args[] = s.split(",");
-            updateWatch(args[0],args[1],args[2]);
+            /* path and data */
+            zkClient.CreateNode(args[0],args[1]);
         }
 
         //start loop thread for Nodes
@@ -138,6 +152,10 @@ public class ServiceManager{
         return true;
     }
 
+    public boolean registerService(String serviceName, String path, String data){
+        return zkClient.CreateNode(path, serviceName + data);
+    }
+
     public String getService(String serviceName) {
         if(managerMap.containsKey(serviceName)){
             if(!managerMap.get(serviceName).isEmpty()) {
@@ -145,10 +163,12 @@ public class ServiceManager{
             }
             else{
                 // TODO: 2017/3/13 use fastJson
-                return G.gson().toJson(new ErrorInfo("Service NodeList is empty","2"));
+                LOG.warn("Service NodeList is empty");
+                return null;
             }
         }else{
-            return G.gson().toJson(new ErrorInfo("Unregister service","1"));
+            LOG.warn("Unregister service");
+            return null;
         }
     }
 

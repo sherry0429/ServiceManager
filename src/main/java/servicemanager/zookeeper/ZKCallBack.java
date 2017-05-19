@@ -6,5 +6,7 @@ package servicemanager.zookeeper;
  * Description:
  */
 public interface ZKCallBack {
-    public void onChildChanged();
+    void onChildAdd(String path, String data);
+    void onChildDelete(String path, String data);
+    void onChildUpdate(String path, String data);
 }
