@@ -26,34 +26,42 @@ public class ServiceManager implements ZKCallBack{
     private Thread cpThread;
     private ZKClient zkClient;
     private ServiceManagerMirror mirror;
-    private String rulerType = "";
+    private String rulerType = "RANDOM";
 
     @Override
-    public void onChildAdd(String path, String data) {
-        String datas[] = data.split(",");
-        if (managerMap.containsKey(datas[2])) {
-            managerMap.get(datas[2]).clear();
-            managerMap.remove(datas[2]);
-            serviceNodeMap.remove(datas[2]);
+    public void onChildAdd(String path, String datas) {
+        String data_ip_port[] = datas.split("-");
+        String data = data_ip_port[0];
+        String ip = data_ip_port[1];
+        int port = Integer.parseInt(data_ip_port[2]);
+        if (managerMap.containsKey(data)) {
+            if(!managerMap.get(data).isExist(ip, port)){
+                Node node = new Node(ip, port, data);
+                managerMap.get(data).insert(node);
+            }
+        } else{
+            NodesGroup nodesGroup = new NodesGroup();
+            nodesGroup.setRuler(switchRuler(rulerType));
+            Node node = new Node(ip, port, data);
+            nodesGroup.insert(node);
+            managerMap.put(data, nodesGroup);
         }
-        NodesGroup nodesGroup = new NodesGroup();
-        nodesGroup.setRuler(switchRuler(rulerType));
-
-        Node node = new Node(datas[0], Integer.parseInt(datas[1]), datas[2]);
-        nodesGroup.insert(node);
-        managerMap.put(datas[2], nodesGroup);
-        serviceNodeMap.put(datas[2],path);
+        if(serviceNodeMap.containsKey(data)) {
+            serviceNodeMap.replace(data,path);
+        }else{
+            serviceNodeMap.put(data,path);
+        }
     }
 
     @Override
     public void onChildDelete(String path, String data) {
-        String datas[] = data.split(",");
-        if (managerMap.containsKey(datas[2])) {
-            managerMap.get(datas[2]).clear();
-            managerMap.remove(datas[2]);
-            serviceNodeMap.remove(datas[2]);
-        }
-
+//        String datas[] = data.split(",");
+//        if (managerMap.containsKey(datas[2])) {
+//            managerMap.get(datas[2]).clear();
+//            managerMap.remove(datas[2]);
+//            serviceNodeMap.remove(datas[2]);
+//        }
+        serviceNodeMap.remove(data);
     }
 
     @Override

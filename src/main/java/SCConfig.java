@@ -25,8 +25,7 @@ class SCConfig {
     private int thriftThreadMax;
 
     SCConfig(String conf) throws Exception {
-        String str = System.getProperty("user.dir") + "\\src\\conf\\sc.conf";
-        LOG.error(str);
+        String str = System.getProperty("user.dir") + "/src/conf/sc.conf";
         Properties properties = new Properties();
         properties.load(new FileInputStream(str));
         parse(properties);

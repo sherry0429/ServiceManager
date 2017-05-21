@@ -44,7 +44,7 @@ public class ZKClient {
     public boolean CreateNode(String path, String data){
         try{
             if(client.checkExists() != null){
-                client.create().inBackground().forPath(path);
+                client.create().inBackground().forPath(path, data.getBytes());
                 PathChildrenCache cache = new PathChildrenCache(client, path, true);
                 cache.getListenable().addListener(new CustomPathListener());
                 cache.start();
