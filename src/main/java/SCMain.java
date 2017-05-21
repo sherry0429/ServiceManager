@@ -1,4 +1,3 @@
-package servicemanager;
 import servicemanager.loadbalance.ServiceManager;
 import servicemanager.thrift.SCService;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -9,9 +8,6 @@ import org.apache.thrift.transport.TTransportException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-import java.lang.management.ManagementFactory;
 import java.util.TimeZone;
 
 /**
@@ -21,7 +17,7 @@ import java.util.TimeZone;
 
 public class SCMain {
     private static final Logger LOG = LoggerFactory.getLogger(SCMain.class);
-    private static final String DEFAULT_CONF_FILE = "conf/sc.conf";
+    private static final String DEFAULT_CONF_FILE = "src/main/conf/sc.conf";
 
     static {
         TimeZone.setDefault(TimeZone.getTimeZone("PRC"));

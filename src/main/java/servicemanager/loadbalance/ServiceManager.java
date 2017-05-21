@@ -3,13 +3,11 @@ package servicemanager.loadbalance;
  * Created by tianyoupan on 16-11-15.
  */
 
-import servicemanager.ZKClient;
 import servicemanager.loadbalance.jmx.ServiceManagerMirror;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import servicemanager.zookeeper.ZKCallBack;
-
-import java.io.IOException;
+import servicemanager.zookeeper.ZKClient;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -162,7 +160,6 @@ public class ServiceManager implements ZKCallBack{
                 return managerMap.get(serviceName).getService();
             }
             else{
-                // TODO: 2017/3/13 use fastJson
                 LOG.warn("Service NodeList is empty");
                 return null;
             }

@@ -1,4 +1,4 @@
-package servicemanager; /**
+/**
  * Created by tianyoupan on 16-11-16.
  */
 
@@ -25,8 +25,10 @@ class SCConfig {
     private int thriftThreadMax;
 
     SCConfig(String conf) throws Exception {
+        String str = System.getProperty("user.dir") + "\\src\\conf\\sc.conf";
+        LOG.error(str);
         Properties properties = new Properties();
-        properties.load(new FileInputStream(conf));
+        properties.load(new FileInputStream(str));
         parse(properties);
     }
 
@@ -34,13 +36,17 @@ class SCConfig {
         //ip and port config
         serverIP = properties.getProperty("serverIP");
         serverPort = Integer.valueOf(properties.getProperty("serverPort"));
+
+        thriftThreadMax = Integer.valueOf(properties.getProperty("thriftThreadMax"));
+
         zkServer = properties.getProperty("zkServer");
         zkPort = Integer.valueOf(properties.getProperty("zkPort"));
+        zkTimeOut = Integer.valueOf(properties.getProperty("zkTimeOut"));
+
         JMXEnabled = properties.getProperty("JMXEnabled");
         String serverList = properties.getProperty("serverList");
-        zkTimeOut = Integer.valueOf(properties.getProperty("zkTimeOut"));
-        thriftThreadMax = Integer.valueOf(properties.getProperty("thriftThreadMax"));
-        servers = serverList.split(",");
+
+        servers = serverList.split("@");
     }
 
     public String getServerIP() {
