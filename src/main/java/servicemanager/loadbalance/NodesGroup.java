@@ -12,7 +12,7 @@ import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import servicemanager.thrift.SCClientService;
+import servicemanager.thrift.LoadBalanceInterface;
 
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
@@ -80,30 +80,28 @@ public class NodesGroup {
     }
 
     void update(){
-        if (true){
-            return;
-        }
         for (Node s : serviceList) {
 
-            String IP = s.getIP();
-            int port = s.getPort();
+            String IP = "127.0.0.1";//s.getIP();
+            int port = 9090;//s.getPort();
             TTransport transport = new TSocket(IP, port, timeout);
             TProtocol protocol = new TBinaryProtocol(transport);
 
             // TMultiplexedProtocol
             TMultiplexedProtocol multiplexedProtocol = new TMultiplexedProtocol(protocol, "sc");
             // 按名称获取服务端注册的service
-            SCClientService.Client client = new SCClientService.Client(multiplexedProtocol);
+            LoadBalanceInterface.Client client = new LoadBalanceInterface.Client(multiplexedProtocol);
             try {
                 transport.open();
             } catch (TTransportException e) {
                 LOG.warn("TTransportException when isSave {}", e.getMessage());
             }
             try {
-                String jsonResponse = null, jsonRequest = "all";
-                jsonResponse = client.requestServiceSituation(jsonRequest);
-                if (jsonResponse != null) {
+                String response = null;
+                response = client.requestServiceSituation("test");
+                if (response != null) {
                     try {
+                        System.out.println(response);
 //                        ComputerStatus status = G.gson().fromJson(jsonResponse, ComputerStatus.class);
 //                        itemStatusMap.put(s,status);
                     } catch (Exception e) {

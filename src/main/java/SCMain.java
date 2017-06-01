@@ -1,5 +1,6 @@
 import servicemanager.loadbalance.ServiceManager;
 import servicemanager.thrift.SCService;
+import servicemanager.thrift.SCManager;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadPoolServer;
@@ -7,7 +8,10 @@ import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TTransportException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import servicemanager.thrift.SCServiceHandler;
 
+import javax.management.*;
+import java.lang.management.ManagementFactory;
 import java.util.TimeZone;
 
 /**
@@ -45,9 +49,19 @@ public class SCMain {
         }
         LOG.info("ServiceManager start success.");
 
+        MBeanServer MBeanServer = ManagementFactory.getPlatformMBeanServer();
+        ObjectName obj = null;
+        try {
+            obj = new ObjectName("pty:name=Monitor");
+            MBeanServer.registerMBean(manager.getMirror(), obj);
+        } catch (MalformedObjectNameException | NotCompliantMBeanException | InstanceAlreadyExistsException | MBeanRegistrationException e) {
+            e.printStackTrace();
+        }
+
         //start thrift Server
         SCServiceHandler handler = new SCServiceHandler(manager);
         SCService.Processor<SCServiceHandler> processor = new SCService.Processor<SCServiceHandler>(handler);
+        SCManager.Processor<SCServiceHandler> processor_2 = new SCManager.Processor<SCServiceHandler>(handler);
         TServerSocket transport = null;
         try {
             transport = new TServerSocket(config.getServerPort());
@@ -55,9 +69,9 @@ public class SCMain {
             LOG.error("TTransportException: {}", e.getMessage());
             System.exit(-1);
         }
-
         TThreadPoolServer.Args tArgs = new TThreadPoolServer.Args(transport);
         tArgs.processor(processor)
+                .processor(processor_2)
                 .protocolFactory(new TBinaryProtocol.Factory())
                 .maxWorkerThreads(config.getThriftThreadMax());
         TServer server = new TThreadPoolServer(tArgs);

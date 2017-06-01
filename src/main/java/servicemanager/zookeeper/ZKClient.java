@@ -31,10 +31,12 @@ public class ZKClient {
 
     public ZKClient(String path){
         try {
-
             RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
             client = CuratorFrameworkFactory.newClient(path, retryPolicy);
             client.start();
+            PathChildrenCache cache = new PathChildrenCache(client, "/", true);
+            cache.getListenable().addListener(new CustomPathListener());
+            cache.start();
         } catch (Exception e) {
             LOG.warn("Zookeeper init failed. Msg : {}", e.getMessage());
         }
@@ -45,9 +47,6 @@ public class ZKClient {
         try{
             if(client.checkExists() != null){
                 client.create().inBackground().forPath(path, data.getBytes());
-                PathChildrenCache cache = new PathChildrenCache(client, path, true);
-                cache.getListenable().addListener(new CustomPathListener());
-                cache.start();
                 return true;
             }
         }catch (Exception e){

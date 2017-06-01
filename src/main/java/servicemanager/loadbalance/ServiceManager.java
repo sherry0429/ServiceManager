@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ServiceManager implements ZKCallBack{
     private static ConcurrentHashMap<String, NodesGroup> managerMap;
+    //serviceNodeMap is for JMX
     private static ConcurrentHashMap<String, String> serviceNodeMap;//serviceName - Node\
     private int NodeConnectTimeout = 1000;
     private static int internal = 5000;
