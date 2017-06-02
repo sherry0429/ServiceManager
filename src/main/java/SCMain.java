@@ -76,7 +76,5 @@ public class SCMain {
                 .maxWorkerThreads(config.getThriftThreadMax());
         TServer server = new TThreadPoolServer(tArgs);
         server.serve();
-
-
     }
 }

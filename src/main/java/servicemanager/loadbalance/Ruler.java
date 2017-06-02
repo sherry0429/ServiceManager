@@ -13,23 +13,15 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 
 class Ruler {
-    private double powerMemory;
-    private double powerCPU;
-    private double powerNetUsg;
-    private double powerDisk;
+    private float powerMemory;
+    private float powerCPU;
+    private float powerNetUsg;
+    private float powerDisk;
     private String type;
 
     Ruler(String type) {
         this.type = type;
         setPowerCount(type);
-    }
-
-    String getType() {
-        return type;
-    }
-
-    private String findMinDefault(ConcurrentHashMap<Node, ComputerStatus> list) {
-        return null;
     }
 
     /**
@@ -41,23 +33,23 @@ class Ruler {
     private void setPowerCount(String type){
         switch (type){
             case "CPUMORE":{
-                setPowerCountCustom(0.7,0.1,0.1,0.1);
+                setPowerCountCustom(0.7f,0.1f,0.1f,0.1f);
                 break;
             }
             case "MEMORYMORE":{
-                setPowerCountCustom(0.1,0.7,0.1,0.1);
+                setPowerCountCustom(0.1f,0.7f,0.1f,0.1f);
                 break;
             }
             case "DISKMORE":{
-                setPowerCountCustom(0.1,0.1,0.7,0.1);
+                setPowerCountCustom(0.1f,0.1f,0.7f,0.1f);
                 break;
             }
             case "NETUSGMORE":{
-                setPowerCountCustom(0.1,0.1,0.1,0.7);
+                setPowerCountCustom(0.1f,0.1f,0.1f,0.7f);
                 break;
             }
             case "AVERAGE":{
-                setPowerCountCustom(0.25,0.25,0.25,0.25);
+                setPowerCountCustom(0.25f,0.25f,0.25f,0.25f);
                 break;
             }
             case "RANDOM":{
@@ -65,57 +57,40 @@ class Ruler {
             }
         }
     }
-    
+
     /**
      * Description: set powerCount by custom.them sum need to be 1.
      * Input: power Params
-     * Output: 
+     * Output:
      * Authers: tianyoupan
      */
-    private void setPowerCountCustom(double powerCPU,double powerMemory,double powerDisk,double powerNetUsg){
+    private void setPowerCountCustom(float powerCPU,float powerMemory,float powerDisk,float powerNetUsg){
         this.powerCPU = powerCPU;
         this.powerDisk = powerDisk;
         this.powerNetUsg = powerNetUsg;
         this.powerMemory = powerMemory;
     }
 
-    /**
-     * Description: findMin by Weighted,powerCount must defined by setPowerCount method first.
-     * Input: map
-     * Output: min node's path,ip:port,name
-     * Authers: tianyoupan
-     */
-    private String findMinByPowerCount(ConcurrentHashMap<Node, ComputerStatus> list) {
-        double min = Double.MAX_VALUE;
-        String path = null;
-        Node minNode = null;
-        for (Map.Entry<Node, ComputerStatus> entry : list.entrySet()) {
-            ComputerStatus value = entry.getValue();
-            double powerCount = value.getMemory() * powerMemory + value.getCPU() * powerCPU + value.getDisk() * powerDisk + value.getNetUsg() * powerNetUsg;
-            if (powerCount < min) {
-                min = powerCount;
-                minNode = entry.getKey();
-            }
+    Node findSuitable(ArrayList<Node> list) {
+        switch (type){
+            case "RANDOM":
+                Random random = new Random();
+                return list.get(random.nextInt(list.size()));
+            default:
+                float score = 0;
+                int index = 0;
+                float min_score = 10000;
+                for (int i = 0; i < list.size(); i++) {
+                    if(score < min_score) {
+                        min_score = score;
+                        index = i;
+                    }
+                    score = list.get(i).getCpu() * powerCPU +
+                            list.get(i).getMem() * powerMemory +
+                            list.get(i).getNet() * powerNetUsg +
+                            list.get(i).getDisk() * powerDisk;
+                }
+                return list.get(index);
         }
-        if (minNode != null) {
-            path = minNode.getIP() + ":" + minNode.getPort() + "," + minNode.getName();
-        }
-        return path;
-    }
-
-    String findMinByRandom(ArrayList<Node> list){
-        Random random = new Random();
-        int index = random.nextInt(list.size());
-        Node node = list.get(index);
-        String path = null;
-        if (node != null) {
-            path = node.getIP() + ":" + node.getPort() + "," + node.getName();
-        }
-        return path;
-    }
-
-
-    String findSuitable(ConcurrentHashMap<Node, ComputerStatus> list) {
-        return findMinByPowerCount(list);
     }
 }

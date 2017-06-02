@@ -14,8 +14,9 @@ import org.slf4j.LoggerFactory;
 public class SCServiceHandler implements SCService.Iface, SCManager.Iface{
 
     private static final Logger LOG = LoggerFactory.getLogger(SCServiceHandler.class);
+    private static int call_number = 0;
     private ServiceManager manager;
-    private boolean debug = true;
+    private boolean debug = false;
     private String test = "call success.";
 
     public SCServiceHandler(ServiceManager manager){
@@ -25,6 +26,7 @@ public class SCServiceHandler implements SCService.Iface, SCManager.Iface{
     @Override
     public String getService(String serviceName) throws TException {
         //request a Service result
+        call_number++;
         if(debug){
             return test;
         }
@@ -32,34 +34,38 @@ public class SCServiceHandler implements SCService.Iface, SCManager.Iface{
     }
 
     @Override
-    public String registerService(String serviceName, String watchNode) throws TException {
+    public String registerService(String serviceName, String xml) throws TException {
+        call_number++;
         if(debug){
             return test;
         }
-        return null;
+        return manager.registerService(serviceName,xml);
     }
 
     @Override
     public String removeService(String serviceName) throws TException {
+        call_number++;
         if(debug){
             return test;
         }
-        return null;
+        return manager.deleteService(serviceName);
     }
 
     @Override
     public String getServiceNodes(String serviceName) throws TException {
+        call_number++;
         if(debug){
             return test;
         }
-        return null;
+        return manager.getServiceNodes(serviceName);
     }
 
     @Override
     public String removeNodes(String nodePath) throws TException {
+        call_number++;
         if(debug){
             return test;
         }
-        return null;
+        return manager.deleteNode(nodePath);
     }
 }

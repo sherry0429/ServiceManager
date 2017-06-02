@@ -7,6 +7,6 @@ package servicemanager.zookeeper;
  */
 public interface ZKCallBack {
     void onChildAdd(String path, String data);
-    void onChildDelete(String path, String data);
+    void onChildDelete(String path);
     void onChildUpdate(String path, String data);
 }

@@ -24,23 +24,41 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NodesGroup {
     private static final Logger LOG = LoggerFactory.getLogger(NodesGroup.class);
     private ArrayList<Node>serviceList;
-    private ConcurrentHashMap<Node,ComputerStatus>itemStatusMap;
     //here if response data is big, time out need be added.
     private int timeout = 2000;
     private Ruler ruler = null;
+    private String path;
 
     NodesGroup(){
         serviceList = new ArrayList<>();
-        itemStatusMap = new ConcurrentHashMap<>();
     }
     void insert(Node node){
         serviceList.add(node);
     }
 
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
     void clear(){
         serviceList.clear();
-        itemStatusMap.clear();
         ruler = null;
+    }
+
+    void deleteNode(String path){
+        int index = 0;
+        for (Node node : serviceList) {
+            if(node.getPath().equals(path)){
+                break;
+            }
+            index++;
+        }
+        serviceList.remove(index);
     }
 
     boolean isExist(String ip, int port){
@@ -63,34 +81,26 @@ public class NodesGroup {
     }
 
     String getService(){
-        //如果iteamStatusMap不可用 按照serviceList，返回RANDOM
-        if(itemStatusMap == null || itemStatusMap.isEmpty() || ruler.getType() == "RANDOM"){
-            return ruler.findMinByRandom(serviceList);
-        }
-        return ruler.findSuitable(itemStatusMap);
+        Node node =  ruler.findSuitable(serviceList);
+        return node.getData();
     }
 
-    public String[] getAllNodes(){
-        String[] nodes = new String[serviceList.size()];
-        int index = 0;
-        for (Node node : serviceList) {
-            nodes[index++]= node.getIP() + ":" + node.getPort() + "," + node.getName();
-        }
-        return nodes;
+    public ArrayList<Node> getServiceList() {
+        return serviceList;
     }
 
     void update(){
         for (Node s : serviceList) {
 
-            String IP = "127.0.0.1";//s.getIP();
-            int port = 9090;//s.getPort();
+            String IP = s.getIP();
+            int port = 9090;
             TTransport transport = new TSocket(IP, port, timeout);
             TProtocol protocol = new TBinaryProtocol(transport);
 
             // TMultiplexedProtocol
-            TMultiplexedProtocol multiplexedProtocol = new TMultiplexedProtocol(protocol, "sc");
+//            TMultiplexedProtocol multiplexedProtocol = new TMultiplexedProtocol(protocol, "sc");
             // 按名称获取服务端注册的service
-            LoadBalanceInterface.Client client = new LoadBalanceInterface.Client(multiplexedProtocol);
+            LoadBalanceInterface.Client client = new LoadBalanceInterface.Client(protocol);
             try {
                 transport.open();
             } catch (TTransportException e) {
@@ -101,14 +111,13 @@ public class NodesGroup {
                 response = client.requestServiceSituation("test");
                 if (response != null) {
                     try {
-                        System.out.println(response);
-//                        ComputerStatus status = G.gson().fromJson(jsonResponse, ComputerStatus.class);
-//                        itemStatusMap.put(s,status);
+                        String status[] = response.split("@");
+                        s.setMem(Float.parseFloat(status[0]));
+                        s.setCpu(Float.parseFloat(status[1]));
+                        s.setDisk(Float.parseFloat(status[2]));
+                        s.setNet(Float.parseFloat(status[3]));
                     } catch (Exception e) {
-//                        LOG.warn("jsonResponse fromJson method failed. ip : {} , port : {}, msg : {}",
-//                                IP,
-//                                String.valueOf(port),
-//                                e.toString());
+                        LOG.warn("get machine status failed. ip : {}, port : {}", s.getIP(), s.getPort());
                     }
                 } else {
                     LOG.warn("TTransport response is null. ip : {}, port {}", IP, port);

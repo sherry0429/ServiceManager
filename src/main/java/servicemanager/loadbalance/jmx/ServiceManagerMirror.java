@@ -3,52 +3,58 @@ package servicemanager.loadbalance.jmx;
  * Created by tianyoupan on 16-11-25.
  */
 
+import servicemanager.loadbalance.Node;
 import servicemanager.loadbalance.NodesGroup;
+import servicemanager.model.Group;
+import servicemanager.model.Groups;
+import servicemanager.model.TestParams;
 
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Description:
  */
 
-public class ServiceManagerMirror implements  ServiceManagerMirrorMBean{
-    private ConcurrentHashMap<String, NodesGroup> managerMap;
-    private ConcurrentHashMap<String, String> serviceNodeMap;//serviceName - Node
+public class ServiceManagerMirror implements ServiceManagerMirrorMBean{
 
-    public ServiceManagerMirror(ConcurrentHashMap<String, NodesGroup> managerMap,ConcurrentHashMap<String, String> serviceNodeMap){
-        this.managerMap = managerMap;
-        this.serviceNodeMap = serviceNodeMap;
+    public ServiceManagerMirror(ConcurrentHashMap<String, NodesGroup> managerMap){
+
+    }
+
+
+    @Override
+    public int thriftConnection() {
+        return TestParams.getThrift_connections();
     }
 
     @Override
-    public String[] getServices() {
-        String[] str = new String[serviceNodeMap.size()];
-        int index = 0;
-        for (Map.Entry<String, String> e : serviceNodeMap.entrySet()) {
-            if (e != null) {
-                str[index++] = e.getKey() + "   " + e.getValue();
-            }
-        }
-        return str;
+    public int thriftCall() {
+        return TestParams.getThrift_call();
     }
 
     @Override
-    public String[] getNodes() {
-        String[] str = new String[serviceNodeMap.size()];
-        int index = 0;
-        for (Map.Entry<String, String> e : serviceNodeMap.entrySet()) {
-            if (e != null) {
-                String serviceNode = e.getValue();
-                NodesGroup nodesGroup = managerMap.get(e.getKey());
-                StringBuffer strBuff = new StringBuffer();
-                strBuff.append(serviceNode + "     ");
-                strBuff.append(Arrays.toString(nodesGroup.getAllNodes()) + '\n');
-                str[index++] = strBuff.toString();
-            }
-        }
-        return str;
+    public int nodes_number() {
+        return TestParams.getNodes_number();
     }
 
+    @Override
+    public int service_number() {
+        return TestParams.getServices_number();
+    }
+
+    @Override
+    public int group_number() {
+        return TestParams.getGroups_number();
+    }
+
+    @Override
+    public String[] service_list() {
+        return TestParams.getServices_list();
+    }
+
+    @Override
+    public String[] node_list() {
+        return TestParams.getNode_list();
+    }
 }
