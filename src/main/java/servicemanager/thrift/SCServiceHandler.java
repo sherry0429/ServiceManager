@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
  * Description: thrift service,return suitable up:port
  */
 
-public class SCServiceHandler implements SCService.Iface, SCManager.Iface{
+public class SCServiceHandler implements SCService.Iface{
 
     private static final Logger LOG = LoggerFactory.getLogger(SCServiceHandler.class);
     private static int call_number = 0;

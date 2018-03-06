@@ -9,7 +9,7 @@ import org.apache.thrift.transport.TTransportException;
 import servicemanager.model.Group;
 import servicemanager.model.Groups;
 import servicemanager.model.ServiceNode;
-import servicemanager.thrift.SCManager;
+import servicemanager.thrift.SCService;
 
 import java.util.Random;
 
@@ -24,27 +24,24 @@ public class client {
         String IP = "127.0.0.1";
         int port = 8000;
         int timeout = 3000;
-        buildGroup("TEST","test");
+        boolean manager = true;
         TTransport transport = new TSocket(IP, port, timeout);
         TProtocol protocol = new TBinaryProtocol(transport);
-        SCManager.Client client = new SCManager.Client(protocol);//初始化Thrift Client
+        SCService.Client client = null;
+        client = new SCService.Client(protocol);//初始化Thrift Client
         try {
             transport.open();
-//            Thrift调用
-//             TODO: 2017/6/1 Success
-//            String response = client.registerService("unUsed",buildGroup("@TEST","test"));
-            // TODO: 2017/6/1 Error
-            String response = client.removeService("test0");
-            // TODO: 2017/6/1 Success
-//            String response = client.removeNodes("/zookeeper/@TEST");
+//           String response = client.registerService("unUsed",buildGroup("@TEST","test"));
+//           String response = client.removeService("test0");
+//           String response = client.removeNodes("/zookeeper/@TEST");
 //            String response = client.getServiceNodes("test1");
+            String response = client.getService("test2");
             System.out.println(response);
         } catch (TException e) {
             e.printStackTrace();
         }finally {
             transport.close();
         }
-
     }
 
     static String buildGroup(String tag, String serviceName){

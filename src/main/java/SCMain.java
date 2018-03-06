@@ -1,6 +1,6 @@
+import org.apache.thrift.TMultiplexedProcessor;
 import servicemanager.loadbalance.ServiceManager;
 import servicemanager.thrift.SCService;
-import servicemanager.thrift.SCManager;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadPoolServer;
@@ -60,8 +60,7 @@ public class SCMain {
 
         //start thrift Server
         SCServiceHandler handler = new SCServiceHandler(manager);
-        SCService.Processor<SCServiceHandler> processor = new SCService.Processor<SCServiceHandler>(handler);
-        SCManager.Processor<SCServiceHandler> processor_2 = new SCManager.Processor<SCServiceHandler>(handler);
+        SCService.Processor<SCServiceHandler> service_client = new SCService.Processor<SCServiceHandler>(handler);
         TServerSocket transport = null;
         try {
             transport = new TServerSocket(config.getServerPort());
@@ -70,8 +69,7 @@ public class SCMain {
             System.exit(-1);
         }
         TThreadPoolServer.Args tArgs = new TThreadPoolServer.Args(transport);
-        tArgs.processor(processor)
-                .processor(processor_2)
+        tArgs.processor(service_client)
                 .protocolFactory(new TBinaryProtocol.Factory())
                 .maxWorkerThreads(config.getThriftThreadMax());
         TServer server = new TThreadPoolServer(tArgs);
